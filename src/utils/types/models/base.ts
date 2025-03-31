@@ -1,6 +1,6 @@
 import { Types } from "mongoose";
 
-export interface baseModelType {
+export interface BaseModelType {
     name: string;
     number: number;
     branch: "wolfcub" | "scout" | "senior" | "pioneer" | "all";
