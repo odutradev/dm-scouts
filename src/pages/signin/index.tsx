@@ -1,67 +1,72 @@
 import React, { useState } from 'react';
-import { Button, TextField, Typography, Container, Box } from '@mui/material';
-import { SignInContainer, StyledForm } from './styles';
-import { SignInData } from './types';
+import { Container, Box, TextField, Button, Typography, Link } from '@mui/material';
+import useMountOnce from '@hooks/useMountOnce';
+import { getConfig } from '@actions/admin';
 
-const SignIn: React.FC = () => {
-  const [formData, setFormData] = useState<SignInData>({ email: '', password: '' });
+const LoginPage: React.FC = () => {
+  const [title, setTitle] = useState<string | null>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Aqui você pode chamar a sua função de autenticação
-    console.log('Dados para autenticação:', formData);
-  };
+  useMountOnce(async () => {
+    const response = await getConfig();
+    if (!('error' in response)){
+      setTitle(response.mode === "GJE" ? "Grande Jogo Escoteiro" : "Jogo da Cidade" );
+    }
+  });
 
   return (
-    <SignInContainer>
-      <Container maxWidth="sm">
-        <Box sx={{ marginTop: 8, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+    <Container component="main" maxWidth="xs">
+      <Box
+        sx={{
+          marginTop: 8,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}
+      >
+        {title && (
           <Typography component="h1" variant="h5">
-            Entrar
+            {title}
           </Typography>
-          <StyledForm onSubmit={handleSubmit}>
-            <TextField
-              variant="outlined"
-              margin="normal"
-              required
-              fullWidth
-              label="Email"
-              name="email"
-              autoComplete="email"
-              autoFocus
-              value={formData.email}
-              onChange={handleChange}
-            />
-            <TextField
-              variant="outlined"
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Senha"
-              type="password"
-              autoComplete="current-password"
-              value={formData.password}
-              onChange={handleChange}
-            />
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              color="primary"
-              sx={{ marginTop: 2 }}
-            >
-              Entrar
-            </Button>
-          </StyledForm>
+        )}
+        <Box component="form" noValidate sx={{ mt: 1 }}>
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="identifier"
+            label="Identificador"
+            name="identifier"
+            autoComplete="username"
+            autoFocus
+          />
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            name="password"
+            label="Senha"
+            type="password"
+            id="password"
+            autoComplete="current-password"
+          />
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            sx={{ mt: 3, mb: 2 }}
+          >
+            Entrar
+          </Button>
+          <Typography variant="body2" align="center">
+            Não tem uma conta?{' '}
+            <Link href="/signup">
+              Cadastre-se
+            </Link>
+          </Typography>
         </Box>
-      </Container>
-    </SignInContainer>
+      </Box>
+    </Container>
   );
 };
 
-export default SignIn;
+export default LoginPage;
