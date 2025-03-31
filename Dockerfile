@@ -1,7 +1,7 @@
 FROM node:18 AS builder
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm install --force
+RUN npm install --omit=optional
 COPY . ./
 RUN npm run build
 
