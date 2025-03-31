@@ -51,15 +51,6 @@ export const getSystemTickets = async (): TypeOrError<TicketModelType[]> => {
     }
 };
 
-export const getSpaceTickets = async (spaceID: string): TypeOrError<TicketModelType[]> => {
-    try {
-        const response = await api.get("/tickets/space/" + spaceID);
-        return response.data;
-    } catch (error) {
-        return manageActionError(error);
-    }
-};
-
 export const updateTicket = async (ticketID: string, data: Partial<TicketModelType>): TypeOrError<TicketModelType> => {
     try {
         const response = await api.patch("/tickets/" + ticketID + "/update", data);
