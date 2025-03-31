@@ -1,19 +1,11 @@
 import { Container, Box, TextField, Button, Typography, Link } from '@mui/material';
-import React, { useState } from 'react';
+import React from 'react';
 
-import useMountOnce from '@hooks/useMountOnce';
-import { getConfig } from '@actions/admin';
 import Footer from '@components/footer';
+import useConfig from '@hooks/useConfig';
 
 const LoginPage: React.FC = () => {
-  const [title, setTitle] = useState<string | null>(null);
-
-  useMountOnce(async () => {
-    const response = await getConfig();
-    if (!('error' in response)) {
-      setTitle(response.mode === "GJE" ? "Grande Jogo Escoteiro" : "Jogo da Cidade");
-    }
-  });
+  const config = useConfig();
 
   return (
     <>
@@ -26,9 +18,9 @@ const LoginPage: React.FC = () => {
             alignItems: 'center',
           }}
         >
-          {title && (
+          {config?.mode && (
             <Typography component="h1" variant="h5">
-              {title}
+              {config.mode === "GJE" ? "Grande Jogo Escoteiro" : "Jogo da Cidade"}
             </Typography>
           )}
           <Box component="form" noValidate sx={{ mt: 1 }}>
