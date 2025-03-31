@@ -1,13 +1,12 @@
-import React, { useState } from 'react';
 import { Container, Box, TextField, Button, Typography, Link } from '@mui/material';
+import React, { useState } from 'react';
+
 import useMountOnce from '@hooks/useMountOnce';
 import { getConfig } from '@actions/admin';
-import useSystemStore from '@stores/system';
 import Footer from '@components/footer';
 
 const LoginPage: React.FC = () => {
   const [title, setTitle] = useState<string | null>(null);
-  const store = useSystemStore(x => x);
 
   useMountOnce(async () => {
     const response = await getConfig();
@@ -15,14 +14,6 @@ const LoginPage: React.FC = () => {
       setTitle(response.mode === "GJE" ? "Grande Jogo Escoteiro" : "Jogo da Cidade");
     }
   });
-
-  const handleToggleTheme = () => {
-    store.updateSystem({
-      theme: store.system.theme === "default"
-        ? "dark"
-        : (store.system.theme === "dark" ? "light" : "dark")
-    });
-  };
 
   return (
     <>
