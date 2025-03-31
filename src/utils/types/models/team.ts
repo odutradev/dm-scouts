@@ -1,6 +1,6 @@
 import { Types } from "mongoose";
 
-export interface teamModelType {
+export interface TeamModelType {
     name: string;
     group: number;
     leader: {
