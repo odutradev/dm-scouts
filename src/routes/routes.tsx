@@ -1,4 +1,5 @@
 import Main from "@pages/main";
+import SignIn from "@pages/signin";
 
 const routes = [
     {
@@ -6,6 +7,7 @@ const routes = [
         privateRoute: false,
         routes: [
             ['/', <Main />],
+            ['/signin', <SignIn />],
         ]
     },
 ];

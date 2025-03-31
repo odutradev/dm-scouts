@@ -1,3 +1,4 @@
+import CssBaseline from '@mui/material/CssBaseline';
 import { createRoot } from 'react-dom/client';
 import { StrictMode, useMemo } from 'react';
 
@@ -23,6 +24,7 @@ const App = () => {
   return (
     <>
       <GlobalStyles />
+      <CssBaseline />
       <ToastContainer {...toastContainerConfig} {...toastExtra} />
       <Router />
     </>
