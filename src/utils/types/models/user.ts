@@ -1,42 +1,18 @@
-export interface UserSpaceType {
-    entryAt?: Date;
-    role: string;
-    name: string;
-    id: string;
-};
-
-export interface UserClassType {
-    entryAt?: Date;
-    name: string;
-    id: string;
-};
+import { Types } from "mongoose";
 
 export interface UserModelType {
-    _id: string;
+    _id?: Types.ObjectId | string;
     id: string;
     order?: number;
     name: string;
-    role: "normal" | "admin";
+    role: "normal" | "admin" | "leadership";
     status: "loggedIn" | "registered" | "blocked";
     createAt?: Date;
     lastUpdate?: Date;
+    group?: string;
     firstSignup?: Date;
     lastGetUser?: Date;
-    spaces?: UserSpaceType[];
-    classes?: UserClassType[];
     description?: string;
-    images?: {
-        profile?: string;
-    };
-    badges?: any[];
-    coins: number;
     password?: string;
     email?: string;
-    keys: {
-        slots: number;
-        specialSlots: number;
-        favoriteSlots: number;
-    };
-};
-
-//bonfire-api version: 1.3.9
+}
