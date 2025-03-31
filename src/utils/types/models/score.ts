@@ -1,24 +1,22 @@
-import { Types } from "mongoose";
-
 export interface ScoreModelType {
-    _id: Types.ObjectId;
+    _id: string;
     baseLeader: {
-        id: Types.ObjectId;
+        id: string;
         name: string;
     };
     score: number;
     extraScore: number;
     extraScoreReason?: string;
     teamLeader: {
-        id: Types.ObjectId;
+        id: string;
         name: string;
     };
     base: {
-        id: Types.ObjectId;
+        id: string;
         name: string;
     };
     team: {
-        id: Types.ObjectId;
+        id: string;
         name: string;
     };
     branch: "wolfcub" | "scout" | "senior" | "pioneer" | "all";

@@ -1,10 +1,8 @@
-import { Types } from "mongoose";
-
 export interface TeamModelType {
     name: string;
     group: number;
     leader: {
-        id: Types.ObjectId;
+        id: string;
         name: string;
     };
     status: "active" | "inactive";

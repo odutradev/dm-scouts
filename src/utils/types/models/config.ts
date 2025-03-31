@@ -1,7 +1,5 @@
-import { Types } from "mongoose";
-
 export interface ConfigModelType {
-    _id: Types.ObjectId;
+    _id: string;
     lastUpdate: Date;
     status: "active" | "inactive";
     maintenanceMode: boolean;

@@ -1,7 +1,5 @@
-import { Types } from "mongoose";
-
 export interface UserModelType {
-    _id?: Types.ObjectId | string;
+    _id?: string;
     id: string;
     order?: number;
     name: string;

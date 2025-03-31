@@ -1,7 +1,5 @@
-import { Types } from "mongoose";
-
 export interface TicketMessageType  {
-    userID: Types.ObjectId;
+    userID: string;
     username: string;
     content: string;
     date: Date;
@@ -12,7 +10,7 @@ export interface TicketModelType {
     type: "suggestion" | "report" | "feedback" | "other";
     messages: TicketMessageType[];
     scope: "system";
-    userID?: Types.ObjectId;
+    userID?: string;
     attachments: string[];
     description?: string;
     displayName: boolean;

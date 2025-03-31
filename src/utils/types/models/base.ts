@@ -1,11 +1,9 @@
-import { Types } from "mongoose";
-
 export interface BaseModelType {
     name: string;
     number: number;
     branch: "wolfcub" | "scout" | "senior" | "pioneer" | "all";
     leader: {
-        id: Types.ObjectId;
+        id: string;
         name: string;
     };
     local: string; 
