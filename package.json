@@ -19,8 +19,7 @@
     "up": "^1.0.2",
     "vite-plugin-svgr": "^4.3.0",
     "yup": "^1.6.1",
-    "zustand": "^5.0.3",
-    "bonfire-shared-types": "git+https://github.com/thebonfiretech/shared-types.git"
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
