@@ -1,10 +1,9 @@
 import { manageActionError, hasAdminPosition } from '@utils/functions/action';
 import api from '@utils/functions/api.ts';
 
-import type { CreateSpaceData, CreateUserData, UpdateSpaceModuleData } from './types';
 import type { DeletedOrError, TypeOrError } from '@utils/types/action';
-import type { SpaceModelType } from '@utils/types/models/space';
 import type { UserModelType } from '@utils/types/models/user';
+import type { ConfigData, CreateUserData } from './types';
 
 
 export const createUser = async (data: CreateUserData): TypeOrError<UserModelType> => {
@@ -31,7 +30,16 @@ export const updateUserById = async (data: Partial<UserModelType>): TypeOrError<
     try {
         hasAdminPosition();
         const userID = data._id || "none";
-        const response = await api.patch("/admin/users/update/" + userID , data);
+        const response = await api.patch("/admin/users/" + userID + "/update" , data);
+        return response.data;
+    } catch (error) {
+        return manageActionError(error);
+    }
+};
+export const updateUserPasswordById = async (userID: string, password: string): TypeOrError<UserModelType> => {
+    try {
+        hasAdminPosition();
+        const response = await api.patch("/admin/users/" + userID + "/update/password" , { password });
         return response.data;
     } catch (error) {
         return manageActionError(error);
@@ -58,52 +66,19 @@ export const deleteUserById = async (userID: string): DeletedOrError => {
     }
 };
 
-export const createSpace = async (data: CreateSpaceData): TypeOrError<SpaceModelType> => {
+export const updateConfig = async (data: Partial<ConfigData>): TypeOrError<ConfigData> => {
     try {
         hasAdminPosition();
-        const response = await api.post("/admin/spaces/create", data);
+        const response = await api.patch("/admin/config/update", data);
         return response.data;
     } catch (error) {
         return manageActionError(error);
     }
 };
 
-export const deleteSpaceById = async (spaceID: string): TypeOrError<DeletedOrError> => {
+export const getConfig = async (): TypeOrError<ConfigData> => {
     try {
-        hasAdminPosition();
-        const response = await api.delete("/admin/spaces/delete/" + spaceID);
-        return response.data;
-    } catch (error) {
-        return manageActionError(error);
-    }
-};
-
-export const updateSpaceById = async (data: Partial<SpaceModelType>): TypeOrError<SpaceModelType> => {
-    try {
-        hasAdminPosition();
-        const spaceID = data._id || "none";
-        const response = await api.patch("/admin/spaces/update/" + spaceID , data);
-        return response.data;
-    } catch (error) {
-        return manageActionError(error);
-    }
-};
-
-export const getAllSpaces = async (): TypeOrError<SpaceModelType[]> => {
-    try {
-        hasAdminPosition();
-        const response = await api.get("/admin/spaces");
-        return response.data;
-    } catch (error) {
-        return manageActionError(error);
-    }
-};
-
-export const updateSpaceModuleById = async ({ data, module="none" }: UpdateSpaceModuleData): TypeOrError<SpaceModelType> => {
-    try {
-        hasAdminPosition();
-        const spaceID = data._id || "none";
-        const response = await api.patch("/spaces/" + spaceID + "/modules/config/" + module , data);
+        const response = await api.get("/users/config");
         return response.data;
     } catch (error) {
         return manageActionError(error);
