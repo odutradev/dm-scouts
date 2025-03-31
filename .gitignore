@@ -25,3 +25,4 @@ dist-ssr
 *.sw?
 
 /src/actions/.base
+package-lock.json
