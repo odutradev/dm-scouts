@@ -197,8 +197,8 @@ const SignIn = () => {
               Não tem uma conta? <Link href="/signup">Cadastre-se</Link>
             </Typography>
           </Box>
+          <Footer />
         </Box>
-      <Footer />
       </Container>
     </>
   );
