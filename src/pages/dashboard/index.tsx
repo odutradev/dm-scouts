@@ -6,8 +6,9 @@ import useSystemStore from '@stores/system';
 import getCurrentTheme from '@styles/theme';
 import { signIn } from '@actions/user';
 import { getAllUsers } from '@actions/admin';
+import Layout from '@components/layout';
 
-const Main = () => {
+const Dashboard = () => {
     const store = useSystemStore(x => x);
 
     const send = () =>
@@ -53,4 +54,4 @@ const Main = () => {
     )
 };
 
-export default Main;
+export default Dashboard;
