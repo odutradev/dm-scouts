@@ -1,22 +1,8 @@
-import {
-  Container,
-  Box,
-  TextField,
-  Typography,
-  Link,
-  InputAdornment,
-  IconButton,
-} from '@mui/material';
-import {
-  Visibility,
-  VisibilityOff,
-  Clear,
-  Person,
-  Lock,
-} from '@mui/icons-material';
+import { Container, Box, TextField, Typography, Link, InputAdornment, IconButton } from '@mui/material';
+import { Visibility,VisibilityOff,Clear,Person,Lock,} from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 import { LoadingButton } from '@mui/lab';
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import * as yup from 'yup';
 
 import { UserAuthSchema } from '@utils/validations/user';
@@ -28,36 +14,26 @@ import { SignInData } from './types';
 
 const SignIn = () => {
   const [credentials, setCredentials] = useState<SignInData>({ id: '', password: '' });
-  const [errorMessage, setErrorMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  const config = useConfig();
   const navigate = useNavigate();
+  const config = useConfig();
 
-  const handleInputChange = (field: keyof SignInData) => (event: React.ChangeEvent<HTMLInputElement>) => {
-    setCredentials((prev) => ({ ...prev, [field]: event.target.value }));
-  };
-
-  const handleClearIdentifier = () => {
-    setCredentials((prev) => ({ ...prev, id: '' }));
-  };
-
-  const handleTogglePasswordVisibility = () => {
-    setShowPassword((prev) => !prev);
-  };
+  const handleInputChange = (field: keyof SignInData) => (event: React.ChangeEvent<HTMLInputElement>) => setCredentials((prev) => ({ ...prev, [field]: event.target.value }));
+  const handleClearIdentifier = () => setCredentials((prev) => ({ ...prev, id: '' }));
+  const handleTogglePasswordVisibility = () =>  setShowPassword((prev) => !prev);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!credentials.id.trim() || !credentials.password.trim()) {
-      return setErrorMessage("Preencha todos os campos");
-    }
+    if (!credentials.id.trim() || !credentials.password.trim()) return setErrorMessage("Preencha todos os campos");
 
     setErrorMessage('');
-    setLoading(true);
     setSuccess(false);
+    setLoading(true);
 
     try {
       await UserAuthSchema.validate(credentials);
@@ -89,7 +65,7 @@ const SignIn = () => {
     }
   };
 
-  const systemName = config?.mode === 'GJE' ? 'Grande Jogo Escoteiro' : 'Jogo da Cidade';
+  const systemName = config?.mode ? (config.mode === 'GJE' ? ' ao Grande Jogo Escoteiro' : ' ao Jogo da Cidade') : '';
 
   return (
     <>
@@ -104,7 +80,7 @@ const SignIn = () => {
           }}
         >
           <Typography component="h1" variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
-            {`Bem-vindo de volta${systemName ? ` ao ${systemName}` : ''}!`}
+            {`Bem-vindo de volta${systemName}!`}
           </Typography>
 
           <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
