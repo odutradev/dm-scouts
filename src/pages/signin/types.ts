@@ -1,5 +1,4 @@
 export interface SignInData {
-    email: string;
-    password: string;
-  }
-  
+  id: string;
+  password: string;
+};

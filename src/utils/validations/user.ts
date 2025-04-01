@@ -1,7 +1,7 @@
 import * as yup from "yup";
 
 export const UserAuthSchema = yup.object().shape({
-  username: yup
+  id: yup
     .string()
     .required("Identificador é obrigatório"),
   password: yup
