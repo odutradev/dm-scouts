@@ -7,7 +7,7 @@ export const FooterContainer = styled(Box)(({ theme }) => ({
     boxShadow: theme.shadows[3],
     padding: theme.spacing(2),
     alignItems: 'center',
-    position:  'absolute',
+    position:  'fixed',
     display: 'flex',
     bottom: 0,
     right: 0,
