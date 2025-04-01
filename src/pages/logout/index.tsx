@@ -1,6 +1,7 @@
-import { useEffect } from 'react';
-import { Box, CircularProgress, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+
+import Loading from '@components/loading';
 
 const Logout = () => {
   const navigate = useNavigate();
@@ -15,25 +16,7 @@ const Logout = () => {
     return () => clearTimeout(timeout);
   }, [navigate]);
 
-  return (
-    <Box
-      sx={{
-        height: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        textAlign: 'center',
-        gap: 2,
-        p: 2,
-      }}
-    >
-      <CircularProgress color="primary" />
-      <Typography variant="h6">
-        Você está sendo deslogado...
-      </Typography>
-    </Box>
-  );
+  return <Loading message="Você está sendo deslogado..."/>;
 };
 
 export default Logout;
