@@ -198,8 +198,8 @@ const SignIn = () => {
             </Typography>
           </Box>
         </Box>
-      </Container>
       <Footer />
+      </Container>
     </>
   );
 };
