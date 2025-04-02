@@ -73,14 +73,13 @@ const SignIn = () => {
 
   return (
     <>
-      <Container component="main" maxWidth="xs">
+      <Container component="main" maxWidth="xs" sx={{ height: "92vh", alignItems: "center", justifyContent: "center", display: "flex" }}>
         <Box
           sx={{
-            marginTop: 8,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            textAlign: 'center',
+            textAlign: 'center'
           }}
         >
           <Typography component="h1" variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
@@ -201,9 +200,9 @@ const SignIn = () => {
               Não tem uma conta? <Link href="/signup">Cadastre-se</Link>
             </Typography>
           </Box>
-          <Footer />
         </Box>
       </Container>
+          <Footer />
     </>
   );
 };

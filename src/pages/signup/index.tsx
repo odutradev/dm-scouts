@@ -73,7 +73,7 @@ const SignUp = () => {
 
   return (
     <>
-      <Container component="main" maxWidth="xs">
+      <Container component="main" maxWidth="xs" sx={{ height: "92vh", alignItems: "center", justifyContent: "center", display: "flex" }}>
         <Box
           sx={{
             marginTop: 8,
@@ -201,9 +201,9 @@ const SignUp = () => {
               Já tem uma conta? <Link href="/signin">Entrar</Link>
             </Typography>
           </Box>
-          <Footer />
         </Box>
       </Container>
+          <Footer />
     </>
   );
 };
