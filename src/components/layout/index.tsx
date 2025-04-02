@@ -10,7 +10,7 @@ import Footer from "@components/footer";
 import type { LayoutProps } from "./types";
 
 import MenuDrawer from "./components/menu";
-const Layout = ({ children, isLoading = false, showFooter = true, title = "Título Padrão" }: LayoutProps) => {
+const Layout = ({ children, isLoading = false, showFooter = true, title = "DM Scouts", showSimpleMenu = false }: LayoutProps) => {
     const [menuOpen, setMenuOpen] = useState(false);
     const theme = useTheme();
 
@@ -20,28 +20,34 @@ const Layout = ({ children, isLoading = false, showFooter = true, title = "Títu
 
     return (
         <Container>
-            <Button 
-                onClick={() => setMenuOpen(true)} 
-                variant="contained" 
-                sx={{ 
-                    position: "absolute", 
-                    top: 16, 
-                    left: "50%", 
-                    transform: "translateX(-50%)", 
-                    backgroundColor: theme.palette.action.disabledBackground, 
-                    color: theme.palette.text.primary, 
-                    '&:hover': { backgroundColor: theme.palette.action.hover },
-                    width: '200px',
-                }}
-                startIcon={<MenuIcon />}
-            >
-                Menu
-            </Button>
+            {
+                showSimpleMenu && (
+                <>                
+                    <Button 
+                        onClick={() => setMenuOpen(true)} 
+                        variant="contained" 
+                        sx={{ 
+                            position: "absolute", 
+                            top: 16, 
+                            left: "50%", 
+                            transform: "translateX(-50%)", 
+                            backgroundColor: theme.palette.action.disabledBackground, 
+                            color: theme.palette.text.primary, 
+                            '&:hover': { backgroundColor: theme.palette.action.hover },
+                            width: '200px',
+                        }}
+                        startIcon={<MenuIcon />}
+                    >
+                        Menu
+                    </Button>
+                    <MenuDrawer 
+                        menuOpen={menuOpen} 
+                        setMenuOpen={setMenuOpen} 
+                    />
+                </>
+                )
+            }
 
-            <MenuDrawer 
-                menuOpen={menuOpen} 
-                setMenuOpen={setMenuOpen} 
-            />
 
             <Content>{isLoading ? <Loading /> : children}</Content>
             {showFooter && <Footer />}
