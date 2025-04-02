@@ -17,10 +17,11 @@ export const Content = styled.main`
     padding: 20px;
     overflow: auto;
     width: 100%;
+    height: auto;
+    min-height: 92vh;
 `;
 
 export const FooterWrapper = styled.footer`
-    margin-top: auto;
 `;
 
 export const MenuButton = styled.button`
