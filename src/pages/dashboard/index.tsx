@@ -27,7 +27,7 @@ const Dashboard = () => {
       });
     
     return (
-      <>
+      <Layout>
         <h1></h1>
         <div className="card">
           <button onClick={send} style={{ background: getCurrentTheme().colors["primary"] }}>
@@ -50,7 +50,7 @@ const Dashboard = () => {
            theme {store.system.theme}
           </button>
         </div>
-      </>
+      </Layout>
     )
 };
 
