@@ -52,8 +52,12 @@ const SignUp = () => {
         callback: () => {
           setSuccess(true);
           setLoading(false);
-          setTimeout(() => {
-            navigate('/dashboard');
+          const checkToken = setInterval(() => {
+            const token = localStorage.getItem('token');
+            if (token) {
+              clearInterval(checkToken);
+              navigate('/dashboard');
+            }
           }, 500);
         },
       });
