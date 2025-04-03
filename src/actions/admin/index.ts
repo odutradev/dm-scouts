@@ -4,6 +4,7 @@ import api from '@utils/functions/api.ts';
 import type { DeletedOrError, TypeOrError } from '@utils/types/action';
 import type { UserModelType } from '@utils/types/models/user';
 import type { ConfigData, CreateUserData } from './types';
+import useSystemStore from '@stores/system';
 
 
 export const createUser = async (data: CreateUserData): TypeOrError<UserModelType> => {
@@ -70,6 +71,8 @@ export const updateConfig = async (data: Partial<ConfigData>): TypeOrError<Confi
     try {
         hasAdminPosition();
         const response = await api.patch("/admin/config/update", data);
+        const { updateSystem } = useSystemStore.getState();
+        updateSystem({ config: response.data });
         return response.data;
     } catch (error) {
         return manageActionError(error);
@@ -79,6 +82,8 @@ export const updateConfig = async (data: Partial<ConfigData>): TypeOrError<Confi
 export const getConfig = async (): TypeOrError<ConfigData> => {
     try {
         const response = await api.get("/users/config");
+        const { updateSystem } = useSystemStore.getState();
+        updateSystem({ config: response.data });
         return response.data;
     } catch (error) {
         return manageActionError(error);

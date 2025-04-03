@@ -1,5 +1,8 @@
+import type { ConfigModelType } from "@utils/types/models/config";
+
 export interface SystemStoreData {
     theme: "light" | "dark" | "default"; 
+    config?: ConfigModelType;
 };
 
 export interface SystemStore {
