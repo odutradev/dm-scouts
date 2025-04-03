@@ -10,13 +10,22 @@ import Footer from "@components/footer";
 import type { LayoutProps } from "./types";
 
 import MenuDrawer from "./components/menu";
-const Layout = ({ children, isLoading = false, showFooter = true, title = "DM Scouts", showSimpleMenu = false }: LayoutProps) => {
+import useUserStore from "@stores/user";
+import useMountOnce from "@hooks/useMountOnce";
+import { getUser } from "@actions/user";
+const Layout = ({ children, isLoading = false, showFooter = true, title = "DM Scouts", showSimpleMenu = false, disableGetUser = false }: LayoutProps) => {
     const [menuOpen, setMenuOpen] = useState(false);
+    const user = useUserStore(x => x.user);
+
     const theme = useTheme();
 
     useEffect(() => {
         document.title = title;
     }, [title]);
+
+    useMountOnce(async () => {
+        if (!disableGetUser) await getUser();
+    });
 
     return (
         <Container>
