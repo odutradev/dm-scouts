@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 
 export interface LayoutProps {
+    disableGetConfig?: boolean;
     disableGetUser?: boolean;
     showSimpleMenu?: boolean;
     showFooter?: boolean;

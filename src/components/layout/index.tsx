@@ -13,7 +13,8 @@ import MenuDrawer from "./components/menu";
 import useUserStore from "@stores/user";
 import useMountOnce from "@hooks/useMountOnce";
 import { getUser } from "@actions/user";
-const Layout = ({ children, isLoading = false, showFooter = true, title = "DM Scouts", showSimpleMenu = false, disableGetUser = false }: LayoutProps) => {
+import { getConfig } from "@actions/admin";
+const Layout = ({ children, isLoading = false, showFooter = true, title = "DM Scouts", showSimpleMenu = false, disableGetUser = false, disableGetConfig = false }: LayoutProps) => {
     const [menuOpen, setMenuOpen] = useState(false);
     const user = useUserStore(x => x.user);
 
@@ -24,9 +25,10 @@ const Layout = ({ children, isLoading = false, showFooter = true, title = "DM Sc
     }, [title]);
 
     useMountOnce(async () => {
+        if (!disableGetConfig) await getConfig();
         if (!disableGetUser) await getUser();
     });
-
+    
     return (
         <Container>
             {
