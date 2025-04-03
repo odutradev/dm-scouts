@@ -1,241 +1,180 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Box,
-  ToggleButton,
-  ToggleButtonGroup,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-  Button,
-  TextField,
-  Grid,
-  MenuItem,
-} from '@mui/material';
-import UserNavbar from '@components/userNavbar';
+import { Box, TextField, Grid, Button } from '@mui/material';
 import Layout from '@components/layout';
-import useSystemStore from '@stores/system';
+import UserNavbar from '@components/userNavbar';
+import { UserModelType } from '@utils/types/models/user';
+import useUserStore from '@stores/user';
 import useAction from '@hooks/useAction';
-import { updateConfig } from '@actions/admin';
+import { updateProfile } from '@actions/user';
 
-const ProfileEdit = () => {
-  const { config } = useSystemStore((x) => x.system);
-  const [confirmOpen, setConfirmOpen] = useState(false);
-  const [pendingValue, setPendingValue] = useState<string | null>(null);
-  const [formValues, setFormValues] = useState({
-    status: 'inactive',
-    mode: '',
-    initialScore: '',
-    maintenanceMode: '',
-    allowTeamRegistration: '',
-    allowBaseRegistration: '',
-    allowScoreApplication: '',
-    lastUpdate: '',
-  });
+const defaultUser: UserModelType = {
+  id: '',
+  name: '',
+  role: 'normal',
+  status: 'registered',
+  email: '',
+  description: '',
+};
+
+const roleMap: Record<UserModelType["role"], string> = {
+  normal: 'Normal',
+  admin: 'Administrador',
+  leadership: 'Liderança',
+};
+
+const statusMap: Record<UserModelType["status"], string> = {
+  loggedIn: 'Logado',
+  registered: 'Registrado',
+  blocked: 'Bloqueado',
+};
+
+const ProfilePage: React.FC = () => {
+  const userFromStore = useUserStore((x) => x.user);
+  const fullUser: UserModelType = { ...defaultUser, ...userFromStore };
+  const [editUser, setEditUser] = useState<UserModelType>(fullUser);
+  const [editMode, setEditMode] = useState(false);
 
   useEffect(() => {
-    if (config) {
-      setFormValues({
-        status: config.status,
-        mode: config.mode,
-        initialScore: config.initialScore.toString(),
-        maintenanceMode: config.maintenanceMode ? 'true' : 'false',
-        allowTeamRegistration: config.allowTeamRegistration ? 'true' : 'false',
-        allowBaseRegistration: config.allowBaseRegistration ? 'true' : 'false',
-        allowScoreApplication: config.allowScoreApplication ? 'true' : 'false',
-        lastUpdate: new Date(config.lastUpdate).toLocaleString(),
-      });
-    }
-  }, [config]);
-
-  const handleToggleChange = (
-    _event: React.MouseEvent<HTMLElement>,
-    newStatus: string | null
-  ) => {
-    if (newStatus !== null) {
-      setPendingValue(newStatus);
-      setConfirmOpen(true);
-    }
-  };
-
-  const handleConfirm = () => {
-    if (pendingValue !== null) {
-      setFormValues((prev) => ({ ...prev, status: pendingValue }));
-    }
-    setConfirmOpen(false);
-    setPendingValue(null);
-  };
-
-  const handleCancel = () => {
-    setConfirmOpen(false);
-    setPendingValue(null);
-  };
+    setEditUser({ ...defaultUser, ...userFromStore });
+  }, [userFromStore]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormValues((prev) => ({ ...prev, [name]: value }));
+    if (name === 'name' || name === 'description' || name === 'email') {
+      setEditUser((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSave = () =>
     useAction({
       action: async () =>
-        await updateConfig({
-          ...formValues,
-          initialScore: Number(formValues.initialScore),
-        } as any),
+        await updateProfile(editUser),
       toastMessages: {
-        success: 'Configurações atualizadas',
+        success: 'Perfil Atualizado',
         error: 'Ocorreu um erro ao atualizar',
-        pending: 'Atualizando configurações',
+        pending: 'Atualizando perfil',
       },
       callback: () => {},
     });
 
+  const handleEdit = () => {
+    setEditMode(true);
+  };
+
   return (
-    <Layout title="Configurações - Edição">
+    <Layout title="Perfil">
       <UserNavbar />
-      <Box sx={{ display: 'flex', flexDirection: 'column', width: '60%', mx: 'auto', p: 2 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
-          <ToggleButtonGroup value={formValues.status} exclusive onChange={handleToggleChange}>
-            <ToggleButton value="active">Edição Habilitada</ToggleButton>
-            <ToggleButton value="inactive">Edição Desabilitada</ToggleButton>
-          </ToggleButtonGroup>
-        </Box>
-
-        <Dialog open={confirmOpen} onClose={handleCancel}>
-          <DialogTitle>
-            {pendingValue === 'active' ? 'Habilitar Edição' : 'Desabilitar Edição'}
-          </DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              {pendingValue === 'active'
-                ? 'Deseja habilitar a edição? Isso permitirá modificar as configurações.'
-                : 'Deseja desabilitar a edição? As configurações permanecerão visíveis, mas não poderão ser alteradas.'}
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCancel} variant="outlined" color="primary">
-              Cancelar
-            </Button>
-            <Button onClick={handleConfirm} variant="contained" color="primary">
-              Confirmar
-            </Button>
-          </DialogActions>
-        </Dialog>
-
-        <Box component="form" noValidate autoComplete="off">
-          <Grid container direction="column" spacing={2}>
-            <Grid item xs={12}>
-              <TextField
-                select
-                name="mode"
-                label="Modo"
-                value={formValues.mode}
-                onChange={handleChange}
-                fullWidth
-                disabled={formValues.status !== 'active'}
-              >
-                <MenuItem value="" disabled>
-                  Selecione um modo
-                </MenuItem>
-                <MenuItem value="GJE">Grande jogo escoteiro</MenuItem>
-                <MenuItem value="JDC">Jogo da cidade</MenuItem>
-              </TextField>
-            </Grid>
-
-            <Grid item xs={12}>
-              <TextField
-                name="initialScore"
-                label="Pontuação Inicial"
-                value={formValues.initialScore}
-                onChange={handleChange}
-                type="number"
-                fullWidth
-                disabled={formValues.status !== 'active'}
-              />
-            </Grid>
-
-            <Grid item xs={12}>
-              <TextField
-                select
-                name="maintenanceMode"
-                label="Manutenção"
-                value={formValues.maintenanceMode}
-                onChange={handleChange}
-                fullWidth
-                disabled={formValues.status !== 'active'}
-              >
-                <MenuItem value="true">Ativado</MenuItem>
-                <MenuItem value="false">Desativado</MenuItem>
-              </TextField>
-            </Grid>
-
-            <Grid item xs={12}>
-              <TextField
-                select
-                name="allowTeamRegistration"
-                label="Registro de Equipe"
-                value={formValues.allowTeamRegistration}
-                onChange={handleChange}
-                fullWidth
-                disabled={formValues.status !== 'active'}
-              >
-                <MenuItem value="true">Permitido</MenuItem>
-                <MenuItem value="false">Não Permitido</MenuItem>
-              </TextField>
-            </Grid>
-
-            <Grid item xs={12}>
-              <TextField
-                select
-                name="allowBaseRegistration"
-                label="Registro de Base"
-                value={formValues.allowBaseRegistration}
-                onChange={handleChange}
-                fullWidth
-                disabled={formValues.status !== 'active'}
-              >
-                <MenuItem value="true">Permitido</MenuItem>
-                <MenuItem value="false">Não Permitido</MenuItem>
-              </TextField>
-            </Grid>
-
-            <Grid item xs={12}>
-              <TextField
-                select
-                name="allowScoreApplication"
-                label="Aplicação de Pontuação"
-                value={formValues.allowScoreApplication}
-                onChange={handleChange}
-                fullWidth
-                disabled={formValues.status !== 'active'}
-              >
-                <MenuItem value="true">Permitido</MenuItem>
-                <MenuItem value="false">Não Permitido</MenuItem>
-              </TextField>
-            </Grid>
-
-            <Grid item xs={12}>
-              <TextField
-                name="lastUpdate"
-                label="Última Atualização"
-                value={formValues.lastUpdate}
-                fullWidth
-                disabled
-              />
-            </Grid>
-
-            <Grid item xs={12}>
-              <Button onClick={handleSave} variant="contained" color="primary" fullWidth>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          width: '70%',
+          margin: 'auto',
+          mt: 4,
+          p: 2,
+        }}
+      >
+        <Grid
+          container
+          spacing={2}
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
+          <Grid item xs={12}>
+            <TextField
+              label="Nome"
+              name="name"
+              value={editUser.name}
+              onChange={handleChange}
+              fullWidth
+              disabled={!editMode}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              label="Email"
+              name="email"
+              value={editUser.email}
+              onChange={handleChange}
+              fullWidth
+              disabled={!editMode}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              label="Cargo"
+              name="role"
+              value={roleMap[editUser.role]}
+              fullWidth
+              disabled
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              label="Status"
+              name="status"
+              value={statusMap[editUser.status]}
+              fullWidth
+              disabled
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              label="Descrição"
+              name="description"
+              value={editUser.description}
+              onChange={handleChange}
+              fullWidth
+              multiline
+              disabled={!editMode}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              label="ID"
+              name="id"
+              value={editUser.id}
+              fullWidth
+              disabled
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              label="Data de Criação"
+              name="createAt"
+              value={
+                editUser.createAt ? new Date(editUser.createAt).toLocaleString() : ''
+              }
+              fullWidth
+              disabled
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              label="Grupo"
+              name="group"
+              value={editUser.group || ''}
+              fullWidth
+              disabled
+            />
+          </Grid>
+          <Grid item xs={12}>
+            {editMode ? (
+              <Button variant="contained" color="primary" onClick={handleSave} fullWidth>
                 Salvar
               </Button>
-            </Grid>
+            ) : (
+              <Button variant="outlined" color="primary" onClick={handleEdit} fullWidth>
+                Editar Perfil
+              </Button>
+            )}
           </Grid>
-        </Box>
+        </Grid>
       </Box>
     </Layout>
   );
 };
 
-export default ProfileEdit;
+export default ProfilePage;
