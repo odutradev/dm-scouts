@@ -14,7 +14,7 @@ export const Content = styled.main`
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: 2.5%;
     overflow: auto;
     width: 100%;
     height: auto;
