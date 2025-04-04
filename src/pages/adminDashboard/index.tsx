@@ -1,243 +1,125 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
+  Typography,
   ToggleButton,
   ToggleButtonGroup,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-  Button,
-  TextField,
-  Grid,
-  MenuItem,
+  Paper,
+  List,
+  ListItem,
+  ListItemText,
 } from '@mui/material';
-import UserNavbar from '@components/userNavbar';
 import Layout from '@components/layout';
-import useSystemStore from '@stores/system';
-import useAction from '@hooks/useAction';
-import { updateConfig } from '@actions/admin';
-import GoBackButton from '@components/goBackButton';
+import { getBranchScores } from '@actions/scores';
+import { ScoreModelType } from '@utils/types/models/score';
 
-const AdminConfigEdit = () => {
-  const { config } = useSystemStore((x) => x.system);
-  const [confirmOpen, setConfirmOpen] = useState(false);
-  const [pendingValue, setPendingValue] = useState<string | null>(null);
-  const [formValues, setFormValues] = useState({
-    status: 'inactive',
-    mode: '',
-    initialScore: '',
-    maintenanceMode: '',
-    allowTeamRegistration: '',
-    allowBaseRegistration: '',
-    allowScoreApplication: '',
-    lastUpdate: '',
-  });
+type Branch = 'wolfcub' | 'scout' | 'senior' | 'pioneer' | 'all';
 
-  useEffect(() => {
-    if (config) {
-      setFormValues({
-        status: config.status,
-        mode: config.mode,
-        initialScore: config.initialScore.toString(),
-        maintenanceMode: config.maintenanceMode ? 'true' : 'false',
-        allowTeamRegistration: config.allowTeamRegistration ? 'true' : 'false',
-        allowBaseRegistration: config.allowBaseRegistration ? 'true' : 'false',
-        allowScoreApplication: config.allowScoreApplication ? 'true' : 'false',
-        lastUpdate: new Date(config.lastUpdate).toLocaleString(),
-      });
-    }
-  }, [config]);
+interface TeamScore {
+  teamID: string;
+  teamName: string;
+  totalScore: number;
+}
 
-  const handleToggleChange = (
-    _event: React.MouseEvent<HTMLElement>,
-    newStatus: string | null
-  ) => {
-    if (newStatus !== null) {
-      setPendingValue(newStatus);
-      setConfirmOpen(true);
-    }
-  };
+const ScoreDashboard = () => {
+  const [branch, setBranch] = useState<Branch>('all');
+  const [ranking, setRanking] = useState<TeamScore[]>([]);
 
-  const handleConfirm = () => {
-    if (pendingValue !== null) {
-      setFormValues((prev) => ({ ...prev, status: pendingValue }));
-    }
-    setConfirmOpen(false);
-    setPendingValue(null);
-  };
+  const fetchScores = async (selectedBranch: Branch) => {
+    const scores = await getBranchScores(selectedBranch);
+    const teamMap = new Map<string, TeamScore>();
 
-  const handleCancel = () => {
-    setConfirmOpen(false);
-    setPendingValue(null);
-  };
+    (scores as ScoreModelType[]).forEach((score) => {
+      const teamID = score.team.id;
+      const teamName = score.team.name;
+      const total = score.score + score.extraScore;
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormValues((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSave = () =>
-    useAction({
-      action: async () =>
-        await updateConfig({
-          ...formValues,
-          initialScore: Number(formValues.initialScore),
-        } as any),
-      toastMessages: {
-        success: 'Configurações atualizadas',
-        error: 'Ocorreu um erro ao atualizar',
-        pending: 'Atualizando configurações',
-      },
-      callback: () => {},
+      if (teamMap.has(teamID)) {
+        teamMap.get(teamID)!.totalScore += total;
+      } else {
+        teamMap.set(teamID, {
+          teamID,
+          teamName,
+          totalScore: total,
+        });
+      }
     });
 
+    const sortedRanking = Array.from(teamMap.values()).sort(
+      (a, b) => b.totalScore - a.totalScore
+    );
+
+    setRanking(sortedRanking);
+  };
+
+  useEffect(() => {
+    fetchScores(branch);
+  }, [branch]);
+
+  const handleBranchChange = (
+    _event: React.MouseEvent<HTMLElement>,
+    newBranch: Branch | null
+  ) => {
+    if (newBranch) setBranch(newBranch);
+  };
+
   return (
-    <Layout title="Configurações - Edição">
-      <GoBackButton/>
-      <UserNavbar />
-      <Box sx={{ display: 'flex', flexDirection: 'column', width: '60%', mx: 'auto', p: 2 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
-          <ToggleButtonGroup value={formValues.status} exclusive onChange={handleToggleChange}>
-            <ToggleButton value="active">Edição Habilitada</ToggleButton>
-            <ToggleButton value="inactive">Edição Desabilitada</ToggleButton>
-          </ToggleButtonGroup>
-        </Box>
+    <Layout title="Ranking de Equipes">
+      <Box
+        sx={{
+          minHeight: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          px: 2,
+          py: 4,
+        }}
+      >
+        <Box sx={{ maxWidth: 900, mx: 'auto', width: '100%' }}>
+          <Typography variant="h4" gutterBottom textAlign="center" fontWeight="bold">
+            Ranking de Equipes
+          </Typography>
 
-        <Dialog open={confirmOpen} onClose={handleCancel}>
-          <DialogTitle>
-            {pendingValue === 'active' ? 'Habilitar Edição' : 'Desabilitar Edição'}
-          </DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              {pendingValue === 'active'
-                ? 'Deseja habilitar a edição? Isso permitirá modificar as configurações.'
-                : 'Deseja desabilitar a edição? As configurações permanecerão visíveis, mas não poderão ser alteradas.'}
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCancel} variant="outlined" color="primary">
-              Cancelar
-            </Button>
-            <Button onClick={handleConfirm} variant="contained" color="primary">
-              Confirmar
-            </Button>
-          </DialogActions>
-        </Dialog>
+          <Box sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}>
+            <ToggleButtonGroup
+              value={branch}
+              exclusive
+              onChange={handleBranchChange}
+            >
+              <ToggleButton value="all">Todos</ToggleButton>
+              <ToggleButton value="wolfcub">Lobinho</ToggleButton>
+              <ToggleButton value="scout">Escoteiro</ToggleButton>
+              <ToggleButton value="senior">Sênior</ToggleButton>
+              <ToggleButton value="pioneer">Pioneiro</ToggleButton>
+            </ToggleButtonGroup>
+          </Box>
 
-        <Box component="form" noValidate autoComplete="off">
-          <Grid container direction="column" spacing={2}>
-            <Grid item xs={12}>
-              <TextField
-                select
-                name="mode"
-                label="Modo"
-                value={formValues.mode}
-                onChange={handleChange}
-                fullWidth
-                disabled={formValues.status !== 'active'}
-              >
-                <MenuItem value="" disabled>
-                  Selecione um modo
-                </MenuItem>
-                <MenuItem value="GJE">Grande jogo escoteiro</MenuItem>
-                <MenuItem value="JDC">Jogo da cidade</MenuItem>
-              </TextField>
-            </Grid>
-
-            <Grid item xs={12}>
-              <TextField
-                name="initialScore"
-                label="Pontuação Inicial"
-                value={formValues.initialScore}
-                onChange={handleChange}
-                type="number"
-                fullWidth
-                disabled={formValues.status !== 'active'}
-              />
-            </Grid>
-
-            <Grid item xs={12}>
-              <TextField
-                select
-                name="maintenanceMode"
-                label="Manutenção"
-                value={formValues.maintenanceMode}
-                onChange={handleChange}
-                fullWidth
-                disabled={formValues.status !== 'active'}
-              >
-                <MenuItem value="true">Ativado</MenuItem>
-                <MenuItem value="false">Desativado</MenuItem>
-              </TextField>
-            </Grid>
-
-            <Grid item xs={12}>
-              <TextField
-                select
-                name="allowTeamRegistration"
-                label="Registro de Equipe"
-                value={formValues.allowTeamRegistration}
-                onChange={handleChange}
-                fullWidth
-                disabled={formValues.status !== 'active'}
-              >
-                <MenuItem value="true">Permitido</MenuItem>
-                <MenuItem value="false">Não Permitido</MenuItem>
-              </TextField>
-            </Grid>
-
-            <Grid item xs={12}>
-              <TextField
-                select
-                name="allowBaseRegistration"
-                label="Registro de Base"
-                value={formValues.allowBaseRegistration}
-                onChange={handleChange}
-                fullWidth
-                disabled={formValues.status !== 'active'}
-              >
-                <MenuItem value="true">Permitido</MenuItem>
-                <MenuItem value="false">Não Permitido</MenuItem>
-              </TextField>
-            </Grid>
-
-            <Grid item xs={12}>
-              <TextField
-                select
-                name="allowScoreApplication"
-                label="Aplicação de Pontuação"
-                value={formValues.allowScoreApplication}
-                onChange={handleChange}
-                fullWidth
-                disabled={formValues.status !== 'active'}
-              >
-                <MenuItem value="true">Permitido</MenuItem>
-                <MenuItem value="false">Não Permitido</MenuItem>
-              </TextField>
-            </Grid>
-
-            <Grid item xs={12}>
-              <TextField
-                name="lastUpdate"
-                label="Última Atualização"
-                value={formValues.lastUpdate}
-                fullWidth
-                disabled
-              />
-            </Grid>
-
-            <Grid item xs={12}>
-              <Button onClick={handleSave} variant="contained" color="primary" fullWidth>
-                Salvar
-              </Button>
-            </Grid>
-          </Grid>
+          <Paper elevation={3} sx={{ borderRadius: 2 }}>
+            <List disablePadding>
+              {ranking.map((team, index) => (
+                <ListItem
+                  key={team.teamID}
+                  divider
+                  sx={{
+                    px: 3,
+                    py: 2,
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <Typography variant="h6">{index + 1}º</Typography>
+                  <ListItemText
+                    primary={<Typography fontWeight={600}>{team.teamName}</Typography>}
+                    secondary={`Pontuação: ${team.totalScore}`}
+                    sx={{ ml: 2 }}
+                  />
+                </ListItem>
+              ))}
+            </List>
+          </Paper>
         </Box>
       </Box>
     </Layout>
   );
 };
 
-export default AdminConfigEdit;
+export default ScoreDashboard;

@@ -10,6 +10,7 @@ import {
 
 export const menuLinks = {
   admin: [
+    { icon: <Settings fontSize="large" />, label: 'Placar geral', path: '/admin/scoreboard' },
     { icon: <Settings fontSize="large" />, label: 'Configurações', path: '/admin/config' },
     { icon: <AccountCircle fontSize="large" />, label: 'Perfil', path: '/dashboard/profile' },
     { icon: <Group fontSize="large" />, label: 'Usuários', path: '/admin/users' },
