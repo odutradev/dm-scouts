@@ -1,153 +1,230 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import {
   Box,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
+  Grid,
+  TextField,
   Button,
-  Paper,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl,
 } from "@mui/material";
 
-import GoBackButton from "@components/goBackButton";
-import UserNavbar from "@components/userNavbar";
 import Layout from "@components/layout";
+import UserNavbar from "@components/userNavbar";
+import GoBackButton from "@components/goBackButton";
 
-import { getAllUsers } from "@actions/admin";
-import type { UserModelType } from "@utils/types/models/user";
-import CreateUserModal from "./components/create";
+import { getUserById, updateUserById } from "@actions/admin";
+import useAction from "@hooks/useAction";
+import { UserModelType } from "@utils/types/models/user";
 
-const UserEdit = () => {
-  const [users, setUsers] = useState<UserModelType[]>([]);
-  const [openModal, setOpenModal] = useState(false);
-  const navigate = useNavigate();
+const roleMap: Record<UserModelType["role"], string> = {
+  normal: "Normal",
+  admin: "Administrador",
+  leadership: "Chefe de Base",
+};
 
-  const fetchUsers = async () => {
-    const data = await getAllUsers();
-    if (!("error" in data)) {
-      setUsers(data);
-    }
-  };
+const statusMap: Record<UserModelType["status"], string> = {
+  loggedIn: "Logado",
+  registered: "Registrado",
+  blocked: "Bloqueado",
+};
+
+const EditUserPage: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const [originalUser, setOriginalUser] = useState<Partial<UserModelType>>({});
+  const [editUser, setEditUser] = useState<Partial<UserModelType>>({});
+  const [editMode, setEditMode] = useState(false);
 
   useEffect(() => {
-    fetchUsers();
-  }, []);
+    if (id) {
+      (async () => {
+        const data = await getUserById(id);
+        if (!("error" in data)) {
+          setOriginalUser(data);
+          setEditUser(data);
+        }
+      })();
+    }
+  }, [id]);
 
-  const handleUserClick = (id: string) => {
-    navigate(`/admin/user/${id}`);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setEditUser((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleOpenModal = () => {
-    setOpenModal(true);
+  const handleRoleChange = (event: any) => {
+    setEditUser((prev) => ({ ...prev, role: event.target.value }));
   };
 
-  const handleCloseModal = async () => {
-    setOpenModal(false);
-    await fetchUsers(); 
+  const handleSave = () => {
+    const updatedFields: Partial<UserModelType> = {
+      _id: (editUser as any)._id,
+    };
+
+    Object.entries(editUser).forEach(([key, value]) => {
+      if (key !== "_id" && value !== (originalUser as any)[key]) {
+        (updatedFields as any)[key] = value;
+      }
+    });
+
+    return useAction({
+      action: async () => await updateUserById(updatedFields),
+      toastMessages: {
+        success: "Usuário atualizado",
+        error: "Erro ao atualizar usuário",
+        pending: "Atualizando usuário...",
+      },
+      callback: () => setEditMode(false),
+    });
   };
 
   return (
-    <Layout title="Usuários">
+    <Layout title="Editar Usuário">
       <GoBackButton />
       <UserNavbar />
-
       <Box
-        display="flex"
-        flexDirection="column"
-        height="auto"
-        minHeight="60vh"
-        width="100%"
-        overflow="hidden"
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          width: "70%",
+          margin: "auto",
+          mt: 4,
+          p: 2,
+        }}
       >
-        <Box
-          flex={1}
-          p={3}
-          display="flex"
-          flexDirection="column"
-          overflow="auto"
-        >
-          <Box display="flex" justifyContent="center" mb={3}>
-            <Button variant="contained" onClick={handleOpenModal}>
-              Criar Usuário
-            </Button>
-          </Box>
+        <Grid container spacing={2} direction="column">
+          <Grid item>
+            <TextField
+              label="ID Público"
+              name="id"
+              value={editUser.id || ""}
+              onChange={handleChange}
+              fullWidth
+              disabled={!editMode}
+            />
+          </Grid>
 
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Nome</TableCell>
-                  <TableCell>ID</TableCell>
-                  <TableCell>Grupo</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell>Função</TableCell>
-                  <TableCell>Criado em</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {users.map((user) => (
-                  <TableRow
-                    key={user.id}
-                    hover
-                    sx={{ cursor: "pointer" }}
-                    onClick={() => handleUserClick(user.id)}
-                  >
-                    <TableCell>{user.name}</TableCell>
-                    <TableCell>{user.id}</TableCell>
-                    <TableCell>{user.group || "-"}</TableCell>
-                    <TableCell>{translateStatus(user.status)}</TableCell>
-                    <TableCell>{translateRole(user.role)}</TableCell>
-                    <TableCell>{formatDate(user.createAt)}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Box>
+          <Grid item>
+            <TextField
+              label="Nome"
+              name="name"
+              value={editUser.name || ""}
+              onChange={handleChange}
+              fullWidth
+              disabled={!editMode}
+            />
+          </Grid>
+
+          <Grid item>
+            <TextField
+              label="Email"
+              name="email"
+              value={editUser.email || ""}
+              onChange={handleChange}
+              fullWidth
+              disabled={!editMode}
+            />
+          </Grid>
+
+          <Grid item>
+            {editMode && editUser.role !== "admin" ? (
+              <FormControl fullWidth>
+                <InputLabel id="cargo-label">Cargo</InputLabel>
+                <Select
+                  labelId="cargo-label"
+                  value={editUser.role || ""}
+                  onChange={handleRoleChange}
+                  label="Cargo"
+                >
+                  <MenuItem value="normal">Normal</MenuItem>
+                  <MenuItem value="leadership">Chefe de Base</MenuItem>
+                </Select>
+              </FormControl>
+            ) : (
+              <TextField
+                label="Cargo"
+                value={roleMap[editUser.role as UserModelType["role"]] || ""}
+                fullWidth
+                disabled
+              />
+            )}
+          </Grid>
+
+          <Grid item>
+            <TextField
+              label="Status"
+              value={statusMap[editUser.status as UserModelType["status"]] || ""}
+              fullWidth
+              disabled
+            />
+          </Grid>
+
+          <Grid item>
+            <TextField
+              label="Descrição"
+              name="description"
+              value={editUser.description || ""}
+              onChange={handleChange}
+              fullWidth
+              multiline
+              disabled={!editMode}
+            />
+          </Grid>
+
+          <Grid item>
+            <TextField
+              label="Data de Criação"
+              value={
+                editUser.createAt
+                  ? new Date(editUser.createAt).toLocaleString()
+                  : ""
+              }
+              fullWidth
+              disabled
+            />
+          </Grid>
+
+          <Grid item>
+            <TextField
+              label="Grupo"
+              name="group"
+              value={editUser.group || ""}
+              onChange={handleChange}
+              fullWidth
+              disabled={!editMode}
+            />
+          </Grid>
+
+          <Grid item>
+            <TextField
+              label="_id"
+              value={(editUser as any)._id || ""}
+              fullWidth
+              disabled
+            />
+          </Grid>
+
+          <Grid item>
+            {editMode ? (
+              <Button variant="contained" onClick={handleSave} fullWidth>
+                Salvar
+              </Button>
+            ) : (
+              <Button
+                variant="outlined"
+                onClick={() => setEditMode(true)}
+                fullWidth
+              >
+                Editar Usuário
+              </Button>
+            )}
+          </Grid>
+        </Grid>
       </Box>
-
-      <CreateUserModal open={openModal} onClose={handleCloseModal} />
     </Layout>
   );
 };
 
-const translateStatus = (status: UserModelType["status"]) => {
-  switch (status) {
-    case "loggedIn":
-      return "Online";
-    case "registered":
-      return "Registrado";
-    case "blocked":
-      return "Bloqueado";
-    default:
-      return "-";
-  }
-};
-
-const translateRole = (role: UserModelType["role"]) => {
-  switch (role) {
-    case "admin":
-      return "Administrador";
-    case "leadership":
-      return "Liderança";
-    case "normal":
-      return "Usuário";
-    default:
-      return "-";
-  }
-};
-
-const formatDate = (date?: Date) => {
-  if (!date) return "-";
-  const d = new Date(date);
-  return d.toLocaleDateString("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  });
-};
-
-export default UserEdit;
+export default EditUserPage;

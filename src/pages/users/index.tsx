@@ -93,7 +93,7 @@ const Users = () => {
                     key={user.id}
                     hover
                     sx={{ cursor: "pointer" }}
-                    onClick={() => handleUserClick(user.id)}
+                    onClick={() => handleUserClick(user._id as string)}
                   >
                     <TableCell>{user.name}</TableCell>
                     <TableCell>{user.id}</TableCell>
