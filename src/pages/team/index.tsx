@@ -105,6 +105,10 @@ const EditTeamPage: React.FC = () => {
     });
   };
 
+  const handleGoToQRCode = () => {
+    navigate(`/shared/team/${id}`);
+  };
+
   return (
     <Layout title="Editar Equipe">
       <GoBackButton />
@@ -260,20 +264,33 @@ const EditTeamPage: React.FC = () => {
             />
           </Grid>
 
-          <Grid item>
-            {editMode ? (
-              <Button variant="contained" onClick={handleSave} fullWidth>
-                Salvar
-              </Button>
-            ) : (
+          <Grid item container spacing={2}>
+            <Grid item xs={12} sm={6}>
+              {editMode ? (
+                <Button variant="contained" onClick={handleSave} fullWidth>
+                  Salvar
+                </Button>
+              ) : (
+                <Button
+                  variant="outlined"
+                  onClick={() => setEditMode(true)}
+                  fullWidth
+                >
+                  Editar Equipe
+                </Button>
+              )}
+            </Grid>
+
+            <Grid item xs={12} sm={6}>
               <Button
-                variant="outlined"
-                onClick={() => setEditMode(true)}
+                variant="contained"
+                color="primary"
+                onClick={handleGoToQRCode}
                 fullWidth
               >
-                Editar Equipe
+                Ver QR Code
               </Button>
-            )}
+            </Grid>
           </Grid>
 
           <Grid item>

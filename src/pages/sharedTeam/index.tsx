@@ -5,6 +5,7 @@ import QRCode from "react-qr-code";
 import html2canvas from "html2canvas";
 import { getTeamById } from "@actions/team";
 import { TeamModelType } from "@utils/types/models/team";
+import GoBackButton from "@components/goBackButton";
 
 const SharedTeam: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -42,7 +43,7 @@ const SharedTeam: React.FC = () => {
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mt: 4, p: 2 }}>
-      {/* Área que será baixada */}
+      <GoBackButton/>
       <Box
         ref={downloadRef}
         sx={{
