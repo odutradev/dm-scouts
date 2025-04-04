@@ -13,6 +13,7 @@ import Bases from "@pages/bases";
 import EditBasePage from "@pages/base";
 import Teams from "@pages/teams";
 import EditTeamPage from "@pages/team";
+import SharedTeam from "@pages/sharedTeam";
 
 const InitialRoute = () => localStorage.getItem("token") != null ? <Navigate to="/dashboard" replace/> : <Navigate to="/signin" />;
 
@@ -25,6 +26,7 @@ const routes = [
             ['/not-found', <NotFound />],
             ['/logout', <Logout />],
             ['/signin', <SignIn />],
+            ['/shared/team/:id', <SharedTeam />],
             ['/signup', <SignUp />],
             ['', <InitialRoute />],
 
