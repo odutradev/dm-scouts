@@ -18,6 +18,7 @@ import Layout from '@components/layout';
 import useSystemStore from '@stores/system';
 import useAction from '@hooks/useAction';
 import { updateConfig } from '@actions/admin';
+import GoBackButton from '@components/goBackButton';
 
 const AdminConfigEdit = () => {
   const { config } = useSystemStore((x) => x.system);
@@ -94,6 +95,7 @@ const AdminConfigEdit = () => {
 
   return (
     <Layout title="Configurações - Edição">
+      <GoBackButton/>
       <UserNavbar />
       <Box sx={{ display: 'flex', flexDirection: 'column', width: '60%', mx: 'auto', p: 2 }}>
         <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
