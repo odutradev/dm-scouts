@@ -65,6 +65,10 @@ const EditUserPage: React.FC = () => {
     setEditUser((prev) => ({ ...prev, role: event.target.value }));
   };
 
+  const handleStatusChange = (event: any) => {
+    setEditUser((prev) => ({ ...prev, status: event.target.value }));
+  };
+
   const handleSave = () => {
     const updatedFields: Partial<UserModelType> = {
       _id: (editUser as any)._id,
@@ -136,16 +140,7 @@ const EditUserPage: React.FC = () => {
             />
           </Grid>
 
-          <Grid item>
-            <TextField
-              label="Email"
-              name="email"
-              value={editUser.email || ""}
-              onChange={handleChange}
-              fullWidth
-              disabled={!editMode}
-            />
-          </Grid>
+          {/* Campo de Email removido */}
 
           <Grid item>
             {editMode && editUser.role !== "admin" ? (
@@ -172,12 +167,28 @@ const EditUserPage: React.FC = () => {
           </Grid>
 
           <Grid item>
-            <TextField
-              label="Status"
-              value={statusMap[editUser.status as UserModelType["status"]] || ""}
-              fullWidth
-              disabled
-            />
+            {editMode ? (
+              <FormControl fullWidth>
+                <InputLabel id="status-label">Status</InputLabel>
+                <Select
+                  labelId="status-label"
+                  value={editUser.status || ""}
+                  onChange={handleStatusChange}
+                  label="Status"
+                >
+                  <MenuItem value="loggedIn">{statusMap.loggedIn}</MenuItem>
+                  <MenuItem value="registered">{statusMap.registered}</MenuItem>
+                  <MenuItem value="blocked">{statusMap.blocked}</MenuItem>
+                </Select>
+              </FormControl>
+            ) : (
+              <TextField
+                label="Status"
+                value={statusMap[editUser.status as UserModelType["status"]] || ""}
+                fullWidth
+                disabled
+              />
+            )}
           </Grid>
 
           <Grid item>
@@ -241,16 +252,18 @@ const EditUserPage: React.FC = () => {
             )}
           </Grid>
 
-          <Grid item>
-            <Button
-              variant="outlined"
-              color="error"
-              onClick={() => setOpenDeleteDialog(true)}
-              fullWidth
-            >
-              Deletar Conta
-            </Button>
-          </Grid>
+          {editUser.role !== "admin" && (
+            <Grid item>
+              <Button
+                variant="outlined"
+                color="error"
+                onClick={() => setOpenDeleteDialog(true)}
+                fullWidth
+              >
+                Deletar Conta
+              </Button>
+            </Grid>
+          )}
         </Grid>
       </Box>
 
@@ -263,11 +276,7 @@ const EditUserPage: React.FC = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenDeleteDialog(false)}>Cancelar</Button>
-          <Button
-            onClick={handleDeleteConfirm}
-            color="error"
-            variant="contained"
-          >
+          <Button onClick={handleDeleteConfirm} color="error" variant="contained">
             Confirmar
           </Button>
         </DialogActions>
