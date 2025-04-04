@@ -96,16 +96,6 @@ const ProfilePage: React.FC = () => {
           </Grid>
           <Grid item xs={12}>
             <TextField
-              label="Email"
-              name="email"
-              value={editUser.email}
-              onChange={handleChange}
-              fullWidth
-              disabled={!editMode}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
               label="Cargo"
               name="role"
               value={roleMap[editUser.role]}
