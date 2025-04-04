@@ -18,7 +18,7 @@ const DashboardPage = () => {
     <Layout title='Painel'>
       <UserNavbar />
       <Box display="flex" justifyContent="center" alignItems="center" height="auto">
-        <Grid container spacing={2} justifyContent="center">
+        <Grid container spacing={2} justifyContent="center" gap={2} padding={2}>
           {menuLinks[userRole].map((action, index) => (
             <Grid key={index} component={"div"}>
               <Button 
