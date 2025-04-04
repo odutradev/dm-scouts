@@ -13,6 +13,14 @@ export const getTeamById = async (teamID: string): TypeOrError<TeamModelType> =>
         return manageActionError(error);
     }
 };
+export const getTeamByCode = async (code: string): TypeOrError<TeamModelType> => {
+    try {
+        const response = await api.get("/teams/code/" + code);
+        return response.data;
+    } catch (error) {
+        return manageActionError(error);
+    }
+};
 
 export const getUserTeams = async (userID: string): TypeOrError<TeamModelType[]> => {
     try {
