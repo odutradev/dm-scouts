@@ -25,13 +25,15 @@ const Users = () => {
   const [openModal, setOpenModal] = useState(false);
   const navigate = useNavigate();
 
+  const fetchUsers = async () => {
+    const data = await getAllUsers();
+    if (!("error" in data)) {
+      setUsers(data);
+    }
+  };
+
   useEffect(() => {
-    (async () => {
-      const data = await getAllUsers();
-      if (!("error" in data)) {
-        setUsers(data);
-      }
-    })();
+    fetchUsers();
   }, []);
 
   const handleUserClick = (id: string) => {
@@ -42,8 +44,9 @@ const Users = () => {
     setOpenModal(true);
   };
 
-  const handleCloseModal = () => {
+  const handleCloseModal = async () => {
     setOpenModal(false);
+    await fetchUsers(); 
   };
 
   return (

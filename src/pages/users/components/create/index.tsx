@@ -59,21 +59,22 @@ import { createUser } from "@actions/admin";
               error: 'Ocorreu um erro ao criar o usuario',
               pending: 'Criando usuario',
             },
-            callback: () => {},
+            callback: () => {
+                if (keepCreating) {
+                  setForm((prev) => ({
+                    id: "",
+                    name: "",
+                    group: "",
+                    role: prev.role,
+                  }));
+                } else {
+                  setForm(initialForm);
+                  setKeepCreating(false);
+                  onClose();
+                }
+            },
           });
   
-      if (keepCreating) {
-        setForm((prev) => ({
-          id: "",
-          name: "",
-          group: "",
-          role: prev.role,
-        }));
-      } else {
-        setForm(initialForm);
-        setKeepCreating(false);
-        onClose();
-      }
     };
   
     return (
