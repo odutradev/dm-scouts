@@ -23,6 +23,15 @@ export const getUserScores = async (userID: string): TypeOrError<ScoreModelType[
     }
 };
 
+export const getBranchScores = async (branch: string): TypeOrError<ScoreModelType[]> => {
+    try {
+        const response = await api.get("/scores/branch/" + branch);
+        return response.data;
+    } catch (error) {
+        return manageActionError(error);
+    }
+};
+
 export const getBaseScores = async (userID: string): TypeOrError<ScoreModelType[]> => {
     try {
         const response = await api.get("/scores/base/" + userID);
