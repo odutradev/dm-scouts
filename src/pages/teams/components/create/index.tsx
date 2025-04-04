@@ -36,7 +36,7 @@ const initialForm: CreateTeamData = {
 const CreateTeamModal = ({ open, onClose }: Props) => {
   const [form, setForm] = useState<CreateTeamData>(initialForm);
   const [keepCreating, setKeepCreating] = useState(false);
-  const [errors, setErrors] = useState({ name: false, leaderID: false });
+  const [nameError, setNameError] = useState(false);
 
   const handleChange =
     (field: keyof Omit<CreateTeamData, "branch">) =>
@@ -46,8 +46,8 @@ const CreateTeamModal = ({ open, onClose }: Props) => {
         ...prev,
         [field]: value,
       }));
-      if (field === "name" || field === "leaderID") {
-        setErrors((prev) => ({ ...prev, [field]: !value.trim() }));
+      if (field === "name") {
+        setNameError(!value.trim());
       }
     };
 
@@ -59,11 +59,8 @@ const CreateTeamModal = ({ open, onClose }: Props) => {
   };
 
   const handleSubmit = () => {
-    if (!form.name.trim() || !(form.leaderID ?? "").trim()) {
-      setErrors({
-        name: !form.name.trim(),
-        leaderID: !(form.leaderID ?? "").trim(),
-      });
+    if (!form.name.trim()) {
+      setNameError(true);
       return;
     }
     useAction({
@@ -97,19 +94,16 @@ const CreateTeamModal = ({ open, onClose }: Props) => {
             label="Nome"
             value={form.name}
             onChange={handleChange("name")}
-            error={errors.name}
-            helperText={errors.name ? "Campo obrigatório" : ""}
+            error={nameError}
+            helperText={nameError ? "Campo obrigatório" : ""}
             fullWidth
             required
           />
           <TextField
             label="ID do Líder"
-            value={form.leaderID ?? ""}
+            value={form.leaderID}
             onChange={handleChange("leaderID")}
-            error={errors.leaderID}
-            helperText={errors.leaderID ? "Campo obrigatório" : ""}
             fullWidth
-            required
           />
           <TextField
             label="Grupo"
