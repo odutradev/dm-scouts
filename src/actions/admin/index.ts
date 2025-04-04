@@ -60,7 +60,7 @@ export const getUserById = async (userID: string): TypeOrError<UserModelType> =>
 export const deleteUserById = async (userID: string): DeletedOrError => {
     try {
         hasAdminPosition();
-        const response = await api.delete("/admin/users/delete/" + userID);
+        const response = await api.delete("/admin/users/" + userID + "/delete");
         return response.data;
     } catch (error) {
         return manageActionError(error);

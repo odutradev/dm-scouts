@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   Box,
   Grid,
@@ -9,13 +9,18 @@ import {
   Select,
   InputLabel,
   FormControl,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Typography,
 } from "@mui/material";
 
 import Layout from "@components/layout";
 import UserNavbar from "@components/userNavbar";
 import GoBackButton from "@components/goBackButton";
 
-import { getUserById, updateUserById } from "@actions/admin";
+import { getUserById, updateUserById, deleteUserById } from "@actions/admin";
 import useAction from "@hooks/useAction";
 import { UserModelType } from "@utils/types/models/user";
 
@@ -33,9 +38,11 @@ const statusMap: Record<UserModelType["status"], string> = {
 
 const EditUserPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [originalUser, setOriginalUser] = useState<Partial<UserModelType>>({});
   const [editUser, setEditUser] = useState<Partial<UserModelType>>({});
   const [editMode, setEditMode] = useState(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -77,6 +84,18 @@ const EditUserPage: React.FC = () => {
         pending: "Atualizando usuário...",
       },
       callback: () => setEditMode(false),
+    });
+  };
+
+  const handleDeleteConfirm = () => {
+    return useAction({
+      action: async () => await deleteUserById((editUser as any)._id),
+      toastMessages: {
+        success: "Usuário deletado com sucesso",
+        error: "Erro ao deletar usuário",
+        pending: "Deletando usuário...",
+      },
+      callback: () => navigate("/admin/users"),
     });
   };
 
@@ -221,8 +240,38 @@ const EditUserPage: React.FC = () => {
               </Button>
             )}
           </Grid>
+
+          <Grid item>
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={() => setOpenDeleteDialog(true)}
+              fullWidth
+            >
+              Deletar Conta
+            </Button>
+          </Grid>
         </Grid>
       </Box>
+
+      <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
+        <DialogTitle>Confirmar Exclusão</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Tem certeza que deseja deletar este usuário? Esta ação não poderá ser desfeita.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDeleteDialog(false)}>Cancelar</Button>
+          <Button
+            onClick={handleDeleteConfirm}
+            color="error"
+            variant="contained"
+          >
+            Confirmar
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Layout>
   );
 };
