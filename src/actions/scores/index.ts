@@ -43,7 +43,6 @@ export const getTeamScores = async (userID: string): TypeOrError<ScoreModelType[
 
 export const createScore = async (data: CreateScoreData): TypeOrError<ScoreModelType> => {
     try {
-        hasAdminPosition();
         const response = await api.post("/scores/create", data);
         return response.data;
     } catch (error) {
