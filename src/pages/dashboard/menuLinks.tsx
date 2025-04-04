@@ -1,5 +1,4 @@
 import { 
-//  Dashboard, 
   Settings, 
   ExitToApp, 
   AccountCircle, 
@@ -10,7 +9,6 @@ import {
 
 export const menuLinks = {
   admin: [
-//    { icon: <Dashboard fontSize="large" />, label: 'Painel', path: '/admin/dashboard' },
     { icon: <Settings fontSize="large" />, label: 'Configurações', path: '/admin/config' },
     { icon: <AccountCircle fontSize="large" />, label: 'Perfil', path: '/dashboard/profile' },
     { icon: <Group fontSize="large" />, label: 'Usuários', path: '/admin/users' },
@@ -20,6 +18,7 @@ export const menuLinks = {
   ],
   normal: [
     { icon: <AccountCircle fontSize="large" />, label: 'Perfil', path: '/dashboard/profile' },
+    { icon: <Groups fontSize="large" />, label: 'Minhas Equipes', path: '/dashboard/user/teams' },
     { icon: <ExitToApp fontSize="large" />, label: 'Encerrar sessão', path: '/logout' }
   ],
   leadership: [
