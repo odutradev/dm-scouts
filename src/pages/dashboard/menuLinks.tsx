@@ -4,7 +4,8 @@ import {
   AccountCircle, 
   Group, 
   Apartment, 
-  Groups 
+  Groups,
+  ScoreOutlined
 } from '@mui/icons-material';
 
 export const menuLinks = {
@@ -22,6 +23,7 @@ export const menuLinks = {
     { icon: <ExitToApp fontSize="large" />, label: 'Encerrar sessão', path: '/logout' }
   ],
   leadership: [
+    { icon: <ScoreOutlined fontSize="large" />, label: 'Adicionar score', path: '/dashboard/add-score' },
     { icon: <AccountCircle fontSize="large" />, label: 'Perfil', path: '/dashboard/profile' },
     { icon: <ExitToApp fontSize="large" />, label: 'Encerrar sessão', path: '/logout' }
   ]

@@ -15,6 +15,7 @@ import Teams from "@pages/teams";
 import EditTeamPage from "@pages/team";
 import SharedTeam from "@pages/sharedTeam";
 import UserTeamsPage from "@pages/userTeams";
+import AddUserScorePage from "@pages/addScore";
 
 const InitialRoute = () => localStorage.getItem("token") != null ? <Navigate to="/dashboard" replace/> : <Navigate to="/signin" />;
 
@@ -40,6 +41,7 @@ const routes = [
             ['/', <Dashboard />],
             ['/profile', <ProfileEdit />],
             ['/user/teams', <UserTeamsPage />],
+            ['/add-score', <AddUserScorePage />],
 
         ]
     },
