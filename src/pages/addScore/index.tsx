@@ -75,6 +75,7 @@ const AddUserScorePage = () => {
       baseLeaderID: user?._id,
       teamLeaderID: team?.teamLeader?.id || "",
       baseID: selectedBase,
+      teamID: team._id,
       score: score,
       extraScore: extraScoreEnabled ? extraScore : 0,
       extraScoreReason: extraScoreEnabled ? extraScoreReason : "",
@@ -98,24 +99,7 @@ const AddUserScorePage = () => {
     callback: () => {
         handleBack()
     },
-});
-
-// const response = await addUserScore(data);
-// if (!("error" in response)) {
-    //   alert("Score adicionado com sucesso!");
-    //   setStep(1);
-    //   setCode("");
-    //   setTeam(null);
-    //   setScore(0);
-    //   setExtraScoreEnabled(false);
-    //   setExtraScore(0);
-    //   setExtraScoreReason("");
-    //   setObservations("");
-    //   setInputIn("");
-    //   setOutputIn("");
-    // } else {
-        //   alert("Erro ao adicionar score.");
-        // }
+      });
     };
     
     const handleBack = () => {
