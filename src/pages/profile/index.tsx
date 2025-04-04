@@ -6,6 +6,7 @@ import { UserModelType } from '@utils/types/models/user';
 import useUserStore from '@stores/user';
 import useAction from '@hooks/useAction';
 import { updateProfile } from '@actions/user';
+import GoBackButton from '@components/goBackButton';
 
 const defaultUser: UserModelType = {
   id: '',
@@ -63,6 +64,7 @@ const ProfilePage: React.FC = () => {
 
   return (
     <Layout title="Perfil">
+      <GoBackButton/>
       <UserNavbar />
       <Box
         sx={{
