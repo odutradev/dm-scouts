@@ -7,6 +7,7 @@ import Logout from "@pages/logout";
 import Dashboard from "@pages/dashboard";
 import AdminConfig from "@pages/adminConfig";
 import ProfileEdit from "@pages/profile";
+import Users from "@pages/users";
 
 const InitialRoute = () => localStorage.getItem("token") != null ? <Navigate to="/dashboard" replace/> : <Navigate to="/signin" />;
 
@@ -38,6 +39,7 @@ const routes = [
         privateRoute: true,
         routes: [
             ['/config', <AdminConfig />],
+            ['/users', <Users />],
 
         ]
     },
