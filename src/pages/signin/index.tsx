@@ -1,8 +1,7 @@
-import { Container, Box, TextField, Typography, Link, InputAdornment, IconButton } from '@mui/material';
+import { Container, Box, TextField, Typography, Link, InputAdornment, IconButton, Button } from '@mui/material';
 import { Visibility,VisibilityOff,Clear,Person,Lock,} from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
-import { LoadingButton } from '@mui/lab';
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import * as yup from 'yup';
 
 import { UserAuthSchema } from '@utils/validations/user';
@@ -16,7 +15,6 @@ const SignIn = () => {
   const [credentials, setCredentials] = useState<SignInData>({ id: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
   const navigate = useNavigate();
@@ -33,7 +31,6 @@ const SignIn = () => {
 
     setErrorMessage('');
     setSuccess(false);
-    setLoading(true);
 
     try {
       await UserAuthSchema.validate(credentials);
@@ -42,7 +39,6 @@ const SignIn = () => {
         action: async () => await signIn(credentials),
         onError: () => {
           setErrorMessage("Ocorreu um erro ao fazer login.");
-          setLoading(false);
         },
         toastMessages: {
           success: "Autenticação realizada com sucesso",
@@ -51,20 +47,18 @@ const SignIn = () => {
         },
         callback: () => {
           setSuccess(true);
-          setLoading(false);
           const checkToken = setInterval(() => {
             const token = localStorage.getItem('token');
             if (token) {
               clearInterval(checkToken);
-              navigate('/dashboard');
+              navigate('/dashboard?reload=true');
             }
-          }, 500);
+          }, 1000);
         },
       });
     } catch (error) {
       if (error instanceof yup.ValidationError) {
         setErrorMessage(error.message);
-        setLoading(false);
       }
     }
   };
@@ -179,11 +173,11 @@ const SignIn = () => {
               </Typography>
             )}
 
-            <LoadingButton
+            <Button
               type="submit"
               fullWidth
               variant="contained"
-              loading={loading}
+ 
               sx={{
                 mt: 3,
                 mb: 2,
@@ -194,7 +188,7 @@ const SignIn = () => {
               }}
             >
               Entrar
-            </LoadingButton>
+            </Button>
 
             <Typography variant="body2" align="center">
               Não tem uma conta? <Link href="/signup">Cadastre-se</Link>
