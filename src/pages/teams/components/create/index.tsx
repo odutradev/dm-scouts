@@ -36,6 +36,7 @@ const initialForm: CreateTeamData = {
 const CreateTeamModal = ({ open, onClose }: Props) => {
   const [form, setForm] = useState<CreateTeamData>(initialForm);
   const [keepCreating, setKeepCreating] = useState(false);
+  const [errors, setErrors] = useState({ name: false, leaderID: false });
 
   const handleChange =
     (field: keyof Omit<CreateTeamData, "branch">) =>
@@ -45,6 +46,9 @@ const CreateTeamModal = ({ open, onClose }: Props) => {
         ...prev,
         [field]: value,
       }));
+      if (field === "name" || field === "leaderID") {
+        setErrors((prev) => ({ ...prev, [field]: !value.trim() }));
+      }
     };
 
   const handleBranchChange = (event: SelectChangeEvent) => {
@@ -55,6 +59,13 @@ const CreateTeamModal = ({ open, onClose }: Props) => {
   };
 
   const handleSubmit = () => {
+    if (!form.name.trim() || !(form.leaderID ?? "").trim()) {
+      setErrors({
+        name: !form.name.trim(),
+        leaderID: !(form.leaderID ?? "").trim(),
+      });
+      return;
+    }
     useAction({
       action: async () => await createTeam(form),
       toastMessages: {
@@ -81,17 +92,22 @@ const CreateTeamModal = ({ open, onClose }: Props) => {
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
       <DialogTitle align="center">Criar novo time</DialogTitle>
       <DialogContent>
-        <Box
-          display="flex"
-          flexDirection="column"
-          gap={3}
-          mt={2}
-          alignItems="center"
-        >
+        <Box display="flex" flexDirection="column" gap={3} mt={2} alignItems="center">
           <TextField
             label="Nome"
             value={form.name}
             onChange={handleChange("name")}
+            error={errors.name}
+            helperText={errors.name ? "Campo obrigatório" : ""}
+            fullWidth
+            required
+          />
+          <TextField
+            label="ID do Líder"
+            value={form.leaderID ?? ""}
+            onChange={handleChange("leaderID")}
+            error={errors.leaderID}
+            helperText={errors.leaderID ? "Campo obrigatório" : ""}
             fullWidth
             required
           />
@@ -101,20 +117,9 @@ const CreateTeamModal = ({ open, onClose }: Props) => {
             onChange={handleChange("group")}
             fullWidth
           />
-          <TextField
-            label="ID do Líder"
-            value={form.leaderID}
-            onChange={handleChange("leaderID")}
-            fullWidth
-          />
           <FormControl fullWidth>
             <InputLabel id="branch-label">Ramo</InputLabel>
-            <Select
-              labelId="branch-label"
-              value={form.branch}
-              label="Ramo"
-              onChange={handleBranchChange}
-            >
+            <Select labelId="branch-label" value={form.branch} label="Ramo" onChange={handleBranchChange}>
               <MenuItem value="wolfcub">Lobinho</MenuItem>
               <MenuItem value="scout">Escoteiro</MenuItem>
               <MenuItem value="senior">Sênior</MenuItem>
@@ -140,10 +145,7 @@ const CreateTeamModal = ({ open, onClose }: Props) => {
       <DialogActions sx={{ justifyContent: "space-between", px: 3, pb: 3 }}>
         <FormControlLabel
           control={
-            <Checkbox
-              checked={keepCreating}
-              onChange={(e) => setKeepCreating(e.target.checked)}
-            />
+            <Checkbox checked={keepCreating} onChange={(e) => setKeepCreating(e.target.checked)} />
           }
           label="Continuar criando"
         />
