@@ -132,7 +132,7 @@ const translateRole = (role: UserModelType["role"]) => {
     case "admin":
       return "Administrador";
     case "leadership":
-      return "Liderança";
+      return "Chefe de base";
     case "normal":
       return "Usuário";
     default:
