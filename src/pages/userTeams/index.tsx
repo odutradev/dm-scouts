@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -9,23 +9,22 @@ import {
   TableHead,
   TableRow,
   Paper,
-  Typography,
 } from "@mui/material";
 
-import Layout from "@components/layout";
-import UserNavbar from "@components/userNavbar";
 import GoBackButton from "@components/goBackButton";
+import UserNavbar from "@components/userNavbar";
+import Layout from "@components/layout";
 
 import { getUserTeams } from "@actions/team";
 import type { TeamModelType } from "@utils/types/models/team";
 import useUserStore from "@stores/user";
 
-const UserTeamsPage: React.FC = () => {
+const Teams = () => {
   const [teams, setTeams] = useState<TeamModelType[]>([]);
-  const user = useUserStore(x => x.user)
+  const user = useUserStore(x => x.user);
   const navigate = useNavigate();
 
-  const fetchUserTeams = async () => {
+  const fetchTeams = async () => {
     const data = await getUserTeams(user?._id as string);
     if (!("error" in data)) {
       setTeams(data);
@@ -33,46 +32,59 @@ const UserTeamsPage: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchUserTeams();
+    fetchTeams();
   }, []);
 
   const handleRowClick = (id: string) => {
-    navigate(`/dashboard/user/team/${id}`);
+    navigate(`/shared/team/${id}?showScore=true`);
   };
 
   return (
-    <Layout title="Minhas Equipes">
+    <Layout title="Meus Times">
       <GoBackButton />
       <UserNavbar />
-      <Box sx={{ p: 3 }}>
-        <Typography variant="h4" gutterBottom>
-          Minhas Equipes
-        </Typography>
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Nome</TableCell>
-                <TableCell>Ramo</TableCell>
-                <TableCell>Código</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {teams.map((team) => (
-                <TableRow
-                  key={(team as any)._id}
-                  hover
-                  sx={{ cursor: "pointer" }}
-                  onClick={() => handleRowClick((team as any)._id)}
-                >
-                  <TableCell>{team.name}</TableCell>
-                  <TableCell>{translateBranch(team.branch)}</TableCell>
-                  <TableCell>{team.number}</TableCell>
+      <Box display="flex" flexDirection="column" minHeight="60vh" width="100%">
+        <Box flex={1} p={3} display="flex" flexDirection="column" overflow="auto">
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Nome</TableCell>
+                  <TableCell>Número</TableCell>
+                  <TableCell>Grupo</TableCell>
+                  <TableCell>Status</TableCell>
+                  <TableCell>Ramo</TableCell>
+                  <TableCell>Líder</TableCell>
+                  <TableCell>Local</TableCell>
+                  <TableCell>Criada em</TableCell>
+                  <TableCell>Última Atualização</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {teams.map((team) => (
+                  <TableRow
+                    key={team.name}
+                    hover
+                    sx={{ cursor: "pointer" }}
+                    onClick={() => handleRowClick((team as any)._id)}
+                  >
+                    <TableCell>{team.name}</TableCell>
+                    <TableCell>{team.number || "-"}</TableCell>
+                    <TableCell>{team.group}</TableCell>
+                    <TableCell>{translateStatus(team.status)}</TableCell>
+                    <TableCell>{translateBranch(team.branch)}</TableCell>
+                    <TableCell>{team.leader?.name || "-"}</TableCell>
+                    <TableCell>{team.local}</TableCell>
+                    <TableCell>{formatDate(team.createAt)}</TableCell>
+                    <TableCell>
+                      {team.lastUpdate ? formatDate(team.lastUpdate) : "-"}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
       </Box>
     </Layout>
   );
@@ -93,4 +105,16 @@ const translateBranch = (branch: TeamModelType["branch"]) => {
   }
 };
 
-export default UserTeamsPage;
+const translateStatus = (status: TeamModelType["status"]) =>
+  status === "active" ? "Ativa" : "Inativa";
+
+const formatDate = (date: Date) => {
+  const d = new Date(date);
+  return d.toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+};
+
+export default Teams;
