@@ -153,7 +153,7 @@ const EditBasePage: React.FC = () => {
           </Grid>
 
           <Grid item>
-            <TextField label="Chefe de Base (ID do usuário)" name="leader" value={editBase?.leader || ""} onChange={handleChange} fullWidth disabled={!editMode} />
+            <TextField label="Chefe de Base" name="leader" value={editBase?.leader.name || ""} onChange={handleChange} fullWidth disabled={!editMode} />
           </Grid>
 
           <Grid item>

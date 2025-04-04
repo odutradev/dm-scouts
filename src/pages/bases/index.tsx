@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Table,
@@ -15,13 +16,14 @@ import GoBackButton from "@components/goBackButton";
 import UserNavbar from "@components/userNavbar";
 import Layout from "@components/layout";
 
-import { getAllBases } from "@actions/base"; // Você precisa implementar isso
+import { getAllBases } from "@actions/base";
 import type { BaseModelType } from "@utils/types/models/base";
-import CreateBaseModal from "./components/create"; // Se quiser um modal de criação
+import CreateBaseModal from "./components/create";
 
 const Bases = () => {
   const [bases, setBases] = useState<BaseModelType[]>([]);
   const [openModal, setOpenModal] = useState(false);
+  const navigate = useNavigate();
 
   const fetchBases = async () => {
     const data = await getAllBases();
@@ -34,13 +36,14 @@ const Bases = () => {
     fetchBases();
   }, []);
 
-  const handleOpenModal = () => {
-    setOpenModal(true);
-  };
-
+  const handleOpenModal = () => setOpenModal(true);
   const handleCloseModal = async () => {
     setOpenModal(false);
     await fetchBases();
+  };
+
+  const handleRowClick = (id: string) => {
+    navigate(`/admin/base/${id}`);
   };
 
   return (
@@ -48,21 +51,8 @@ const Bases = () => {
       <GoBackButton />
       <UserNavbar />
 
-      <Box
-        display="flex"
-        flexDirection="column"
-        height="auto"
-        minHeight="60vh"
-        width="100%"
-        overflow="hidden"
-      >
-        <Box
-          flex={1}
-          p={3}
-          display="flex"
-          flexDirection="column"
-          overflow="auto"
-        >
+      <Box display="flex" flexDirection="column" minHeight="60vh" width="100%">
+        <Box flex={1} p={3} display="flex" flexDirection="column" overflow="auto">
           <Box display="flex" justifyContent="center" mb={3}>
             <Button variant="contained" onClick={handleOpenModal}>
               Criar Base
@@ -85,8 +75,13 @@ const Bases = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {bases.map((base, index) => (
-                  <TableRow key={index} hover>
+                {bases.map((base) => (
+                  <TableRow
+                    key={base.name}
+                    hover
+                    sx={{ cursor: "pointer" }}
+                    onClick={() => handleRowClick((base as any)._id)}
+                  >
                     <TableCell>{base.name}</TableCell>
                     <TableCell>{base.number}</TableCell>
                     <TableCell>{translateBranch(base.branch)}</TableCell>
@@ -128,9 +123,8 @@ const translateBranch = (branch: BaseModelType["branch"]) => {
   }
 };
 
-const translateStatus = (status: BaseModelType["status"]) => {
-  return status === "active" ? "Ativa" : "Inativa";
-};
+const translateStatus = (status: BaseModelType["status"]) =>
+  status === "active" ? "Ativa" : "Inativa";
 
 const translateType = (type: BaseModelType["type"]) => {
   switch (type) {
