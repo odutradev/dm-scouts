@@ -59,19 +59,30 @@ const typeOptions: BaseModelType["type"][] = [
 const CreateBaseModal: React.FC<Props> = ({ open, onClose }) => {
   const [form, setForm] = useState<CreateBaseData>(defaultData);
   const [keepCreating, setKeepCreating] = useState(false);
+  const [errors, setErrors] = useState({ name: false, leaderID: false });
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+    if (name === "name" || name === "leaderID") {
+      setErrors((prev) => ({ ...prev, [name]: !value.trim() }));
+    }
   };
 
   const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({ ...prev, number: Number(e.target.value) }));
   };
 
-  const handleCreate = () =>
+  const handleCreate = () => {
+    if (!form.name.trim() || !form.leaderID.trim()) {
+      setErrors({
+        name: !form.name.trim(),
+        leaderID: !form.leaderID.trim(),
+      });
+      return;
+    }
     useAction({
       action: async () => await createBase(form as any),
       toastMessages: {
@@ -93,6 +104,7 @@ const CreateBaseModal: React.FC<Props> = ({ open, onClose }) => {
         }
       },
     });
+  };
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
@@ -104,6 +116,18 @@ const CreateBaseModal: React.FC<Props> = ({ open, onClose }) => {
             name="name"
             value={form.name}
             onChange={handleChange}
+            error={errors.name}
+            helperText={errors.name ? "Campo obrigatório" : ""}
+            fullWidth
+            required
+          />
+          <TextField
+            label="ID do Chefe de Base"
+            name="leaderID"
+            value={form.leaderID}
+            onChange={handleChange}
+            error={errors.leaderID}
+            helperText={errors.leaderID ? "Campo obrigatório" : ""}
             fullWidth
             required
           />
@@ -114,14 +138,6 @@ const CreateBaseModal: React.FC<Props> = ({ open, onClose }) => {
             onChange={handleChange}
             fullWidth
             multiline
-          />
-          <TextField
-            label="ID do Chefe de Base"
-            name="leaderID"
-            value={form.leaderID}
-            onChange={handleChange}
-            fullWidth
-            required
           />
           <TextField
             label="Ramo"
