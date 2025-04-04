@@ -12,6 +12,7 @@ import UserEdit from "@pages/user";
 import Bases from "@pages/bases";
 import EditBasePage from "@pages/base";
 import Teams from "@pages/teams";
+import EditTeamPage from "@pages/team";
 
 const InitialRoute = () => localStorage.getItem("token") != null ? <Navigate to="/dashboard" replace/> : <Navigate to="/signin" />;
 
@@ -45,6 +46,7 @@ const routes = [
             ['/config', <AdminConfig />],
             ['/user/:id', <UserEdit />],
             ['/base/:id', <EditBasePage />],
+            ['/team/:id', <EditTeamPage/>],
             ['/users', <Users />],
             ['/bases', <Bases />],
             ['/teams', <Teams />],
