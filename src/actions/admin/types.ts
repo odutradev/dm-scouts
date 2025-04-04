@@ -1,7 +1,7 @@
 export interface CreateUserData {
     role: "normal" | "leadership"
     name: string;
-    grup: string;
+    group: string;
     id: string;
 };
 

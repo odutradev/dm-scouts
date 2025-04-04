@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box,
+import {
+  Box,
   Table,
   TableBody,
   TableCell,
@@ -17,9 +18,11 @@ import Layout from "@components/layout";
 
 import { getAllUsers } from "@actions/admin";
 import type { UserModelType } from "@utils/types/models/user";
+import CreateUserModal from "./components/create";
 
 const Users = () => {
   const [users, setUsers] = useState<UserModelType[]>([]);
+  const [openModal, setOpenModal] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -35,14 +38,19 @@ const Users = () => {
     navigate(`/admin/user/${id}`);
   };
 
-  const handleCreateUser = () => {
-    navigate("/admin/user/create");
+  const handleOpenModal = () => {
+    setOpenModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
   };
 
   return (
     <Layout title="Usuários">
       <GoBackButton />
       <UserNavbar />
+
       <Box
         display="flex"
         flexDirection="column"
@@ -59,7 +67,7 @@ const Users = () => {
           overflow="auto"
         >
           <Box display="flex" justifyContent="center" mb={3}>
-            <Button variant="contained" onClick={handleCreateUser}>
+            <Button variant="contained" onClick={handleOpenModal}>
               Criar Usuário
             </Button>
           </Box>
@@ -97,6 +105,8 @@ const Users = () => {
           </TableContainer>
         </Box>
       </Box>
+
+      <CreateUserModal open={openModal} onClose={handleCloseModal} />
     </Layout>
   );
 };
