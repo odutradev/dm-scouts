@@ -12,6 +12,8 @@ import {
 import Layout from '@components/layout';
 import { getBranchScores } from '@actions/scores';
 import { ScoreModelType } from '@utils/types/models/score';
+import GoBackButton from '@components/goBackButton';
+import UserNavbar from '@components/userNavbar';
 
 type Branch = 'wolfcub' | 'scout' | 'senior' | 'pioneer' | 'all';
 
@@ -65,6 +67,8 @@ const ScoreDashboard = () => {
 
   return (
     <Layout title="Ranking de Equipes">
+      <GoBackButton/>
+      <UserNavbar/>
       <Box
         sx={{
           minHeight: '100vh',
