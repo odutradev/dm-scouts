@@ -1,101 +1,164 @@
 import React, { useState } from "react";
 import {
-  Box,
-  Button,
   Dialog,
-  DialogActions,
-  DialogContent,
   DialogTitle,
-  MenuItem,
+  DialogContent,
+  DialogActions,
   TextField,
+  Button,
+  MenuItem,
+  Stack,
+  FormControlLabel,
+  Checkbox,
+  Box,
 } from "@mui/material";
-
+import { BaseModelType } from "@utils/types/models/base";
 import { createBase } from "@actions/base";
 import useAction from "@hooks/useAction";
-import { BaseModelType } from "@utils/types/models/base";
 
 interface Props {
   open: boolean;
   onClose: () => void;
 }
 
-interface CreateBaseData {
+type CreateBaseData = {
   name: string;
-  number: number;
-  branch: BaseModelType["branch"];
-  leader: {
-    id: string;
-    name: string;
-  };
-  local: string;
-  status: BaseModelType["status"];
-  type: BaseModelType["type"];
   description?: string;
-}
+  leaderID: string;
+  branch: BaseModelType["branch"];
+  number: number;
+  local: string;
+  type: BaseModelType["type"];
+};
+
+const defaultData: CreateBaseData = {
+  name: "",
+  description: "",
+  leaderID: "",
+  branch: "all",
+  number: 0,
+  local: "",
+  type: "fixed",
+};
+
+const branchOptions: BaseModelType["branch"][] = [
+  "wolfcub",
+  "scout",
+  "senior",
+  "pioneer",
+  "all",
+];
+
+const typeOptions: BaseModelType["type"][] = [
+  "fixed",
+  "mobile",
+  "secret",
+  "special",
+];
 
 const CreateBaseModal: React.FC<Props> = ({ open, onClose }) => {
-  const [form, setForm] = useState<CreateBaseData>({
-    name: "",
-    number: 0,
-    branch: "scout",
-    type: "fixed",
-    status: "active",
-    local: "",
-    leader: {
-      id: "",
-      name: "",
-    },
-    description: "",
-  });
+  const [form, setForm] = useState<CreateBaseData>(defaultData);
+  const [keepCreating, setKeepCreating] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleLeaderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      leader: {
-        ...prev.leader,
-        [name]: value,
-      },
-    }));
+  const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm((prev) => ({ ...prev, number: Number(e.target.value) }));
   };
 
-  const handleSubmit = () =>
+  const handleCreate = () =>
     useAction({
       action: async () => await createBase(form as any),
       toastMessages: {
-        success: "Base criada com sucesso!",
-        error: "Erro ao criar base.",
+        success: "Base criada com sucesso",
+        error: "Erro ao criar base",
         pending: "Criando base...",
       },
-      callback: onClose,
+      callback: () => {
+        if (keepCreating) {
+          setForm((prev) => ({
+            ...defaultData,
+            branch: prev.branch,
+            type: prev.type,
+          }));
+        } else {
+          setForm(defaultData);
+          setKeepCreating(false);
+          onClose();
+        }
+      },
     });
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
-      <DialogTitle>Criar Nova Base</DialogTitle>
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
+      <DialogTitle align="center">Criar Nova Base</DialogTitle>
       <DialogContent>
-        <Box display="flex" flexDirection="column" gap={2} mt={1}>
+        <Stack spacing={2} mt={1}>
           <TextField
             label="Nome"
             name="name"
             value={form.name}
             onChange={handleChange}
             fullWidth
+            required
           />
+          <TextField
+            label="Descrição"
+            name="description"
+            value={form.description}
+            onChange={handleChange}
+            fullWidth
+            multiline
+          />
+          <TextField
+            label="ID do Chefe de Base"
+            name="leaderID"
+            value={form.leaderID}
+            onChange={handleChange}
+            fullWidth
+            required
+          />
+          <TextField
+            label="Ramo"
+            name="branch"
+            select
+            value={form.branch}
+            onChange={handleChange}
+            fullWidth
+            required
+          >
+            {branchOptions.map((branch) => (
+              <MenuItem key={branch} value={branch}>
+                {translateBranch(branch)}
+              </MenuItem>
+            ))}
+          </TextField>
+          <TextField
+            label="Tipo"
+            name="type"
+            select
+            value={form.type}
+            onChange={handleChange}
+            fullWidth
+            required
+          >
+            {typeOptions.map((type) => (
+              <MenuItem key={type} value={type}>
+                {translateType(type)}
+              </MenuItem>
+            ))}
+          </TextField>
           <TextField
             label="Número"
             name="number"
             type="number"
             value={form.number}
-            onChange={handleChange}
+            onChange={handleNumberChange}
             fullWidth
           />
           <TextField
@@ -105,77 +168,59 @@ const CreateBaseModal: React.FC<Props> = ({ open, onClose }) => {
             onChange={handleChange}
             fullWidth
           />
-          <TextField
-            select
-            label="Ramo"
-            name="branch"
-            value={form.branch}
-            onChange={handleChange}
-            fullWidth
-          >
-            <MenuItem value="wolfcub">Lobinho</MenuItem>
-            <MenuItem value="scout">Escoteiro</MenuItem>
-            <MenuItem value="senior">Sênior</MenuItem>
-            <MenuItem value="pioneer">Pioneiro</MenuItem>
-            <MenuItem value="all">Todos</MenuItem>
-          </TextField>
-          <TextField
-            select
-            label="Tipo"
-            name="type"
-            value={form.type}
-            onChange={handleChange}
-            fullWidth
-          >
-            <MenuItem value="fixed">Fixa</MenuItem>
-            <MenuItem value="mobile">Móvel</MenuItem>
-            <MenuItem value="secret">Secreta</MenuItem>
-            <MenuItem value="special">Especial</MenuItem>
-          </TextField>
-          <TextField
-            select
-            label="Status"
-            name="status"
-            value={form.status}
-            onChange={handleChange}
-            fullWidth
-          >
-            <MenuItem value="active">Ativa</MenuItem>
-            <MenuItem value="inactive">Inativa</MenuItem>
-          </TextField>
-          <TextField
-            label="ID do Chefe"
-            name="id"
-            value={form.leader.id}
-            onChange={handleLeaderChange}
-            fullWidth
-          />
-          <TextField
-            label="Nome do Chefe"
-            name="name"
-            value={form.leader.name}
-            onChange={handleLeaderChange}
-            fullWidth
-          />
-          <TextField
-            label="Descrição"
-            name="description"
-            value={form.description}
-            onChange={handleChange}
-            fullWidth
-            multiline
-            minRows={3}
-          />
-        </Box>
+        </Stack>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>Cancelar</Button>
-        <Button variant="contained" onClick={handleSubmit}>
-          Criar
-        </Button>
+      <DialogActions sx={{ justifyContent: "space-between", px: 3, pb: 3 }}>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={keepCreating}
+              onChange={(e) => setKeepCreating(e.target.checked)}
+            />
+          }
+          label="Continuar criando"
+        />
+        <Box display="flex" gap={2}>
+          <Button onClick={onClose}>Cancelar</Button>
+          <Button variant="contained" onClick={handleCreate}>
+            {keepCreating ? "Criar e continuar" : "Criar"}
+          </Button>
+        </Box>
       </DialogActions>
     </Dialog>
   );
+};
+
+const translateBranch = (branch: BaseModelType["branch"]) => {
+  switch (branch) {
+    case "wolfcub":
+      return "Lobinho";
+    case "scout":
+      return "Escoteiro";
+    case "senior":
+      return "Sênior";
+    case "pioneer":
+      return "Pioneiro";
+    case "all":
+      return "Todos";
+    default:
+      return "-";
+  }
+};
+
+const translateType = (type: BaseModelType["type"]) => {
+  switch (type) {
+    case "fixed":
+      return "Fixa";
+    case "mobile":
+      return "Móvel";
+    case "secret":
+      return "Secreta";
+    case "special":
+      return "Especial";
+    default:
+      return "-";
+  }
 };
 
 export default CreateBaseModal;

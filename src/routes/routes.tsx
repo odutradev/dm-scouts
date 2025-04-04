@@ -9,6 +9,7 @@ import AdminConfig from "@pages/adminConfig";
 import ProfileEdit from "@pages/profile";
 import Users from "@pages/users";
 import UserEdit from "@pages/user";
+import Bases from "@pages/bases";
 
 const InitialRoute = () => localStorage.getItem("token") != null ? <Navigate to="/dashboard" replace/> : <Navigate to="/signin" />;
 
@@ -42,6 +43,7 @@ const routes = [
             ['/config', <AdminConfig />],
             ['/user/:id', <UserEdit />],
             ['/users', <Users />],
+            ['/bases', <Bases />],
 
         ]
     },
