@@ -7,7 +7,8 @@ const Logout = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    localStorage.clear();
+    localStorage.removeItem("user-store");
+    localStorage.removeItem("token");
 
     const timeout = setTimeout(() => {
       navigate('/signin');
