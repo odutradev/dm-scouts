@@ -64,6 +64,7 @@ const Teams = () => {
               <TableHead>
                 <TableRow>
                   <TableCell>Nome</TableCell>
+                  <TableCell>Número</TableCell>
                   <TableCell>Grupo</TableCell>
                   <TableCell>Status</TableCell>
                   <TableCell>Ramo</TableCell>
@@ -82,10 +83,11 @@ const Teams = () => {
                     onClick={() => handleRowClick((team as any)._id)}
                   >
                     <TableCell>{team.name}</TableCell>
+                    <TableCell>{team.number || "-"}</TableCell>
                     <TableCell>{team.group}</TableCell>
                     <TableCell>{translateStatus(team.status)}</TableCell>
                     <TableCell>{translateBranch(team.branch)}</TableCell>
-                    <TableCell>{team.leader.name}</TableCell>
+                    <TableCell>{team.leader?.name || "-"}</TableCell>
                     <TableCell>{team.local}</TableCell>
                     <TableCell>{formatDate(team.createAt)}</TableCell>
                     <TableCell>

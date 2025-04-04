@@ -45,7 +45,6 @@ const EditTeamPage: React.FC = () => {
     }
   }, [id]);
 
-  // Atualiza campos simples e também permite atualizar campos aninhados, como "leader.id" e "leader.name"
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     if (name.includes(".")) {
@@ -75,7 +74,6 @@ const EditTeamPage: React.FC = () => {
   };
 
   const handleSave = () => {
-    // Construímos um objeto apenas com os campos alterados (exceto o id, que já vem como parâmetro)
     const updatedFields: Partial<TeamModelType> = {};
 
     Object.entries(editTeam).forEach(([key, value]) => {
@@ -130,6 +128,16 @@ const EditTeamPage: React.FC = () => {
               onChange={handleChange}
               fullWidth
               disabled={!editMode}
+            />
+          </Grid>
+
+          <Grid item>
+            <TextField
+              label="Número"
+              name="number"
+              value={editTeam.number || ""}
+              fullWidth
+              disabled
             />
           </Grid>
 

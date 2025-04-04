@@ -1,6 +1,7 @@
 export interface TeamModelType {
     name: string;
     group: number;
+    number: number;
     leader: {
         id: string;
         name: string;
